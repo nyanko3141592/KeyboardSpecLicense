@@ -188,28 +188,30 @@ function renderBadge() {
   const bandText = '#ffffff';
   const border = 6;
   const paddingRight = 35;
+  const topMargin = 17; // margin from top to black stroke top
+  const leftOffset = 35; // left margin to black stroke left
 
   // geometry
-  const mainRadius = 60;
-  const mainStrokeBlack = 15;
-  const mainStrokeBg = 15;
-  const mainOuterRadius = mainRadius + mainStrokeBlack / 2 + mainStrokeBg / 2;
-  const mainTopLeftOffset = 35;
-  const mainCx = mainTopLeftOffset + mainOuterRadius;
-  const mainCy = mainTopLeftOffset + mainOuterRadius;
-  const mainEffective = mainOuterRadius * 2;
+  const mainWhiteRadius = 60; // white diameter 120px
+  const mainRingBlack = 15;
+  const mainRingBg = 15;
+  const mainBlackOuterRadius = mainWhiteRadius + mainRingBlack; // outer edge of black ring
+  const mainBgOuterRadius = mainBlackOuterRadius + mainRingBg; // outer edge of bg ring
+  const mainCx = leftOffset + mainBlackOuterRadius;
+  const mainCy = topMargin + mainBlackOuterRadius; // black ring top = topMargin
+  const mainEffective = mainBgOuterRadius * 2;
 
-  const attrRadius = 45;
+  const attrRadius = 45; // white core radius => 90px diameter
   const attrStroke = 12;
   const attrOuterR = attrRadius + attrStroke / 2;
-  const attrSpacing = attrOuterR * 2 + 16; // little gap
-  const attrStartX = mainTopLeftOffset + mainEffective + 24 + attrOuterR;
-  const attrRowY = mainTopLeftOffset + attrOuterR; // top aligns with main top-left margin
+  const attrSpacing = attrOuterR * 2 + 8; // reduced gap
+  const attrStartX = leftOffset + mainEffective + 12 + attrOuterR;
+  const attrRowY = topMargin + attrOuterR; // align tops of black strokes with topMargin
 
   const contentWidth = icons.length
     ? attrStartX + (icons.length - 1) * attrSpacing + attrOuterR + paddingRight
-    : mainTopLeftOffset + mainEffective + paddingRight;
-  const width = Math.max(contentWidth, mainTopLeftOffset + mainOuterRadius + paddingRight) + border;
+    : leftOffset + mainEffective + paddingRight;
+  const width = Math.max(contentWidth, leftOffset + mainBgOuterRadius + paddingRight) + border;
 
   const circles = icons
     .map((icon, i) => {
@@ -232,25 +234,26 @@ function renderBadge() {
     .join('');
 
   const footerPieces = [
-    state.mainLabel.toString().toUpperCase().slice(0, 2) || '0',
     ...icons.map((i) => (i.abbr || '').toString().toUpperCase().slice(0, 2)),
   ];
 
   const svgMarkup = `
-    <rect width="${width}" height="${canvasHeight}" fill="${bg}" stroke="${ink}" stroke-width="${border}" />
+    <rect width="${width}" height="${canvasHeight}" fill="${bg}" />
     <g>
       ${circles}
       <rect x="0" y="${canvasHeight - bandHeight}" width="${width}" height="${bandHeight}" fill="${band}" />
       ${footerPieces
         .map((txt, idx) => {
-          const cx = idx === 0 ? mainCx : attrStartX + (idx - 1) * attrSpacing;
+          const cx = attrStartX + idx * attrSpacing;
           const y = canvasHeight - bandHeight / 2;
           return `<text x="${cx}" y="${y}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="34" font-weight="700" fill="${bandText}" dominant-baseline="middle">${txt}</text>`;
         })
         .join('')}
-      <circle cx="${mainCx}" cy="${mainCy}" r="${mainRadius}" fill="#ffffff" stroke="${ink}" stroke-width="${mainStrokeBlack}" />
-      <circle cx="${mainCx}" cy="${mainCy}" r="${mainRadius + mainStrokeBlack / 2 + mainStrokeBg / 2}" fill="none" stroke="${bg}" stroke-width="${mainStrokeBg}" />
+      <circle cx="${mainCx}" cy="${mainCy}" r="${mainBgOuterRadius}" fill="${bg}" />
+      <circle cx="${mainCx}" cy="${mainCy}" r="${mainBlackOuterRadius}" fill="${ink}" />
+      <circle cx="${mainCx}" cy="${mainCy}" r="${mainWhiteRadius}" fill="#ffffff" />
       <text x="${mainCx}" y="${mainCy + 14}" text-anchor="middle" font-family="${'Space Grotesk'}" font-size="36" font-weight="700" fill="${ink}">${state.mainLabel || '0'}</text>
+      <rect width="${width}" height="${canvasHeight}" fill="none" stroke="${ink}" stroke-width="${border}" />
     </g>
   `;
 
