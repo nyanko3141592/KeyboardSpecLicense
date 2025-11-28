@@ -6,8 +6,8 @@ GitHub Pages 向けのビルド不要なシングルページ版。`index.html` 
 
 1. `open index.html` で開く（または `npx serve` などで静的配信）。
 2. 左フォームを操作すると右のバッジが即時更新。
-3. エクスポートで `keyspec-badge.png` / `keyspec-badge.svg` を取得。
-4. アイコン差し替えは `public/*.png` を上書き、または UI からローカル画像をアップロードしてカテゴリ単位で置換（略称も指定可）。
+3. プレビュー右上の「保存」ボタンで 2000px PNG を保存（ワンクリック）。
+4. アイコン差し替えは `public/fram25_tiles/*.png` を上書き、または UI からローカル画像をアップロードしてカテゴリ単位で置換（略称も指定可）。
 
 ## デプロイ (GitHub Pages)
 
@@ -19,7 +19,7 @@ GitHub Pages 向けのビルド不要なシングルページ版。`index.html` 
 - `index.html` – UI 本体（hidden input も含む）
 - `styles.css` – テーマとレイアウト
 - `main.js` – 状態管理、SVG描画、PNG/SVG エクスポート、カスタムアイコン処理
-- `public/` – アイコンPNG置き場（ID↔ファイル名は `main.js` の `iconFileMap` 参照）
+- `public/fram25_tiles/` – アイコンPNG置き場（ID↔ファイル名は `main.js` の `iconFileMap` 参照）
 - `docs/USAGE.md` – 詳細な操作手順とアイコン差し替えの説明
 
 ## 既知の TODO / 伸びしろ
