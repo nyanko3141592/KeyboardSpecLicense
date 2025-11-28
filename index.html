@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KeySpec Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">KeySpec Generator</p>
+        <h1>自作キーボードのスペックバッジを即生成</h1>
+        <p class="lede">
+          左のフォームを触ると右のバッジがリアルタイムで更新。PNG/SVGをそのまま
+          GitHub Pages から配布できます。
+        </p>
+      </div>
+      <div class="badge-chip">MVP build</div>
+    </header>
+
+    <main class="layout">
+      <section class="panel controls" aria-label="設定フォーム">
+        <div class="field">
+          <label for="main-label">メインアイコンのテキスト</label>
+          <input
+            id="main-label"
+            type="text"
+            maxlength="4"
+            placeholder="42"
+            value="42"
+          />
+          <p class="hint">例: 42 / 60% / TKL</p>
+        </div>
+
+        <div class="field inline">
+          <div>
+            <label>テーマ</label>
+            <div class="segmented" role="group" aria-label="テーマ切り替え">
+              <button data-theme="light" class="active">ライト</button>
+              <button data-theme="dark">ダーク</button>
+            </div>
+          </div>
+          <div>
+            <label for="pitch-input">キーピッチ</label>
+            <div class="pitch-set">
+              <input id="pitch-input" type="text" value="19mm" />
+              <button id="set-pitch">セット</button>
+            </div>
+            <p class="hint">19mm / 19.05 / 17x18 など文字でOK</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>属性アイコン（カテゴリ別・固定並び）</label>
+          <div id="palette" class="palette-stack"></div>
+          <p class="hint">カテゴリごとに1つを選択（ピッチは右で入力）。並び順は固定。</p>
+        </div>
+
+        <div class="field">
+          <label>選択済みアイコン</label>
+          <ul id="selected-list" class="selected-list"></ul>
+        </div>
+
+        <div class="field">
+          <label for="footer-text">下部帯テキスト</label>
+          <textarea id="footer-text" rows="2"></textarea>
+          <div class="row gap-sm">
+            <button id="reset-footer" class="ghost">自動生成に戻す</button>
+            <span class="hint">自動: メイン + 略称を " - " で連結</span>
+          </div>
+        </div>
+
+        <div class="field export">
+          <label>エクスポート</label>
+          <div class="row gap-sm wrap">
+            <button data-png="800">PNG 800px</button>
+            <button data-png="2000">PNG 2000px (印刷向け)</button>
+            <button id="download-svg">SVG</button>
+            <button id="copy-markdown" class="ghost">Markdownをコピー</button>
+            <button id="copy-html" class="ghost">HTMLをコピー</button>
+          </div>
+          <p class="hint">
+            GitHub Pages にそのまま置ける構成。ダウンロードしたファイル名は
+            `keyspec-badge.png` / `keyspec-badge.svg` 推奨。
+          </p>
+        </div>
+      </section>
+
+      <section class="panel preview" aria-label="プレビュー">
+        <div class="preview-head">
+          <div>
+            <p class="eyebrow">リアルタイムプレビュー</p>
+            <h2>Badge Live Preview</h2>
+          </div>
+          <div class="theme-chip" id="theme-chip">LIGHT</div>
+        </div>
+        <div class="preview-canvas" id="preview-area">
+          <svg id="badge-svg" role="img" aria-label="KeySpec badge"></svg>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footnote">
+      <p>
+        プレースホルダーアイコン: <code>public/placeholder-icon.png</code> を差し替えてください。
+        GitHub Pages 用にビルド不要のシングルページ構成です。
+      </p>
+    </footer>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
