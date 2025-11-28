@@ -2,12 +2,12 @@
 
 GitHub Pages 向けのビルド不要なシングルページ版。`index.html` をルートに配置すればそのまま動きます。
 
-## 使い方
+## 使い方（概要）
 
-1. `git clone` 後、ローカルで開く: `open index.html` または `npx serve` などで静的配信。
-2. 左のフォームを操作すると右のバッジプレビューが即時更新。
-3. エクスポートボタンで `keyspec-badge.png` / `keyspec-badge.svg` を取得。
-4. `public/*.png` を差し替えてください。`shape-split.png` などカテゴリ別にプレースホルダーを作成済みです（中身は1pxダミー）。
+1. `open index.html` で開く（または `npx serve` などで静的配信）。
+2. 左フォームを操作すると右のバッジが即時更新。
+3. エクスポートで `keyspec-badge.png` / `keyspec-badge.svg` を取得。
+4. アイコン差し替えは `public/*.png` を上書き、または UI からローカル画像をアップロードしてカテゴリ単位で置換（略称も指定可）。
 
 ## デプロイ (GitHub Pages)
 
@@ -16,14 +16,17 @@ GitHub Pages 向けのビルド不要なシングルページ版。`index.html` 
 
 ## 構成
 
-- `index.html` – UI 本体
+- `index.html` – UI 本体（hidden input も含む）
 - `styles.css` – テーマとレイアウト
-- `main.js` – 状態管理、SVG描画、PNG/SVG エクスポート
-- `public/placeholder-icon.png` – 差し替え用プレースホルダー
+- `main.js` – 状態管理、SVG描画、PNG/SVG エクスポート、カスタムアイコン処理
+- `public/` – アイコンPNG置き場（ID↔ファイル名は `main.js` の `iconFileMap` 参照）
+- `docs/USAGE.md` – 詳細な操作手順とアイコン差し替えの説明
 
 ## 既知の TODO / 伸びしろ
 
-- アイコンを本物の線画に差し替え（各 `public/<id>.png` を上書き）
-- URL パラメータでの状態保持
+- アイコン素材の本番差し替え（`public/<id>.png`）
+- URL パラメータでの状態保存
 - QR 埋め込みや外部 SVG アップロード
-- CC風の円アイコン（人型・情報ソース）を本物に差し替える
+- CC風アイコンの差し替え
+
+詳細は `docs/USAGE.md` を参照してください。

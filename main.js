@@ -181,9 +181,8 @@ const selectedList = document.getElementById('selected-list');
 const svg = document.getElementById('badge-svg');
 const themeChip = document.getElementById('theme-chip');
 const footerField = document.getElementById('footer-text');
-const iconTargetSelect = document.getElementById('icon-target');
-const iconUrlInput = document.getElementById('icon-url');
-const iconFileInput = document.getElementById('icon-file');
+const mainImageFileInput = document.getElementById('main-image-file');
+const customIconFileInput = document.getElementById('custom-icon-file');
 const iconFileMap = {
   'firmware-qmk': 'firm-qmk.png',
   'firmware-zmk': 'firm-zmk.png',
@@ -202,6 +201,33 @@ const categoryOrder = [
   'features',
 ];
 const multiSelectCategories = new Set(['connect', 'compat', 'pointing', 'firmware', 'features']);
+
+function startCustomIcon(category) {
+  if (customIconFileInput) {
+    customIconFileInput.dataset.cat = category;
+    customIconFileInput.click();
+  }
+}
+
+function finishCustomIcon(category, src) {
+  const abbr = prompt('帯に入れる略称（2-4文字推奨）', 'CU') || 'CU';
+  const icon = {
+    id: `custom-${category}`,
+    category,
+    label: 'Custom',
+    abbr,
+    description: 'ユーザー指定アイコン',
+  };
+  state.customIconMap[icon.id] = src;
+  const isMulti = multiSelectCategories.has(category);
+  const sameCategoryIndex = state.selectedIcons.findIndex((i) => i.category === category);
+  if (!isMulti && sameCategoryIndex >= 0) {
+    state.selectedIcons.splice(sameCategoryIndex, 1, icon);
+  } else {
+    state.selectedIcons.push(icon);
+  }
+  finalizeSelection();
+}
 
 function bootstrapDefaults() {
   const defaults = [
@@ -224,14 +250,6 @@ function findIcon(id) {
 
 function renderPalette() {
   paletteBox.innerHTML = '';
-  if (iconTargetSelect && iconTargetSelect.childElementCount === 0) {
-    palette.forEach((i) => {
-      const opt = document.createElement('option');
-      opt.value = i.id;
-      opt.textContent = `${i.label} (${i.category})`;
-      iconTargetSelect.appendChild(opt);
-    });
-  }
   const categories = categoryOrder.filter((c) => c !== 'pitch');
   const titles = {
     shape: '形状 (Shape)',
@@ -260,6 +278,15 @@ function renderPalette() {
         btn.addEventListener('click', () => toggleIcon(icon));
         grid.appendChild(btn);
       });
+
+    // custom image option per category
+    const customBtn = document.createElement('button');
+    customBtn.textContent = 'カスタム画像を選ぶ';
+    customBtn.classList.add('ghost');
+    const selectedCustom = state.selectedIcons.find((i) => i.id === `custom-${cat}`);
+    customBtn.classList.toggle('active', Boolean(selectedCustom));
+    customBtn.addEventListener('click', () => startCustomIcon(cat));
+    grid.appendChild(customBtn);
     group.appendChild(grid);
 
     const selected = state.selectedIcons.filter((i) => i.category === cat);
@@ -557,8 +584,8 @@ function setMainLabel(value) {
   renderBadge();
 }
 
-function setMainImageUrl(value) {
-  state.mainImageUrl = value.trim();
+function setMainImageDataUrl(dataUrl) {
+  state.mainImageUrl = dataUrl;
   renderBadge();
 }
 
@@ -644,39 +671,53 @@ function wireUI() {
     setMainLabel(e.target.value.toUpperCase());
   });
 
-  document.getElementById('main-image-url').addEventListener('input', (e) => {
-    setMainImageUrl(e.target.value);
-  });
-
-  document.getElementById('set-icon-url').addEventListener('click', () => {
-    const id = iconTargetSelect.value;
-    const url = iconUrlInput.value.trim();
-    if (!id || !url) return;
-    state.customIconMap[id] = url;
-    renderBadge();
-    renderPalette();
-  });
-
-  document.getElementById('reset-icon-url').addEventListener('click', () => {
-    const id = iconTargetSelect.value;
-    if (!id) return;
-    delete state.customIconMap[id];
-    renderBadge();
-    renderPalette();
-  });
-
-  iconFileInput.addEventListener('change', (e) => {
+  mainImageFileInput.addEventListener('change', (e) => {
     const file = e.target.files?.[0];
-    const id = iconTargetSelect.value;
-    if (!file || !id) return;
+    if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
-      state.customIconMap[id] = reader.result;
+    reader.onload = () => setMainImageDataUrl(reader.result);
+    reader.readAsDataURL(file);
+    mainImageFileInput.value = '';
+  });
+
+  document.getElementById('reset-main-image').addEventListener('click', () => {
+    state.mainImageUrl = '';
+    renderBadge();
+  });
+
+  paletteBox.addEventListener('click', (e) => {
+    const applyId = e.target.dataset.iconApply;
+    const resetId = e.target.dataset.iconReset;
+    if (applyId) {
+      const input = paletteBox.querySelector(`input[data-icon-url=\"${applyId}\"]`);
+      const url = input?.value.trim();
+      if (url) {
+        state.customIconMap[applyId] = url;
+        renderBadge();
+        renderPalette();
+      }
+    }
+    if (resetId) {
+      delete state.customIconMap[resetId];
       renderBadge();
       renderPalette();
-    };
-    reader.readAsDataURL(file);
-    iconFileInput.value = '';
+    }
+  });
+
+  paletteBox.addEventListener('change', (e) => {
+    const fileId = e.target.dataset.iconFile;
+    if (fileId) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        state.customIconMap[fileId] = reader.result;
+        renderBadge();
+        renderPalette();
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    }
   });
 
   document.querySelectorAll('.segmented button').forEach((btn) => {
@@ -700,6 +741,16 @@ function wireUI() {
   document.getElementById('copy-html').addEventListener('click', (e) => {
     const html = '<img src="./keyspec-badge.png" alt="KeySpec badge" width="800" />';
     copyText(html, e.target);
+  });
+
+  customIconFileInput.addEventListener('change', (e) => {
+    const cat = customIconFileInput.dataset.cat;
+    const file = e.target.files?.[0];
+    if (!cat || !file) return;
+    const reader = new FileReader();
+    reader.onload = () => finishCustomIcon(cat, reader.result);
+    reader.readAsDataURL(file);
+    customIconFileInput.value = '';
   });
 }
 
