@@ -183,11 +183,34 @@ const footerField = document.getElementById('footer-text');
 const mainImageFileInput = document.getElementById('main-image-file');
 const customIconFileInput = document.getElementById('custom-icon-file');
 const iconFileMap = {
-  'firmware-qmk': 'firm-qmk.png',
-  'firmware-zmk': 'firm-zmk.png',
-  'compat-mx': 'switch-mx.png',
-  'feature-ec': 'extra-ec.png',
-  'feature-dp': 'extra-dp.png',
+  // Shape
+  'shape-split': 'fram25_tiles/split.png',
+  'shape-unibody': 'fram25_tiles/unit.png',
+  'shape-macropad': 'fram25_tiles/macro.png',
+  // Stagger / layout
+  'stagger-row': 'fram25_tiles/row-sta.png',
+  'stagger-column': 'fram25_tiles/col-sta.png',
+  'layout-or': 'fram25_tiles/ortho.png',
+  'layout-alice': 'fram25_tiles/alice.png',
+  'layout-grin': 'fram25_tiles/grin.png',
+  // Connection
+  'connect-wr': 'fram25_tiles/wired.png',
+  'connect-wl': 'fram25_tiles/wireless.png',
+  'connect-halfwired': 'fram25_tiles/halifWireless.png',
+  // Switch / keycap compatibility
+  'compat-mx': 'fram25_tiles/mx.png',
+  'compat-chocv1': 'fram25_tiles/chocv1.png',
+  'compat-chocv2': 'fram25_tiles/chocv2.png',
+  // Pointing devices
+  'pointing-tb': 'fram25_tiles/trackball.png',
+  'pointing-tp': 'fram25_tiles/trackpoint.png',
+  'pointing-td': 'fram25_tiles/trackpad.png',
+  // Firmware
+  'firmware-qmk': 'fram25_tiles/qmk.png',
+  'firmware-zmk': 'fram25_tiles/zmk.png',
+  // Features
+  'feature-ec': 'fram25_tiles/encoder.png',
+  'feature-dp': 'fram25_tiles/display.png',
 };
 const categoryOrder = [
   'shape',

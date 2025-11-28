@@ -11,7 +11,7 @@
 
 ## 画像差し替え
 - ベース画像は `public/*.png`。IDとファイル名の対応は `main.js` の `iconFileMap` を参照。  
-  - 例: `compat-mx` → `switch-mx.png`, `feature-ec` → `extra-ec.png`, `feature-dp` → `extra-dp.png`, `firmware-qmk` → `firm-qmk.png`, `firmware-zmk` → `firm-zmk.png`
+- 例: `compat-mx` → `fram25_tiles/mx.png`, `feature-ec` → `fram25_tiles/encoder.png`, `feature-dp` → `fram25_tiles/display.png`, `firmware-qmk` → `fram25_tiles/qmk.png`, `firmware-zmk` → `fram25_tiles/zmk.png`
 - カスタムアイコンはアップロードのみ（URL指定なし）。アップロード後に略称入力ダイアログが出る。  
 - リセットは同カテゴリ内で別アイコンを選択するか、再読み込みで初期状態に戻せます。
 
