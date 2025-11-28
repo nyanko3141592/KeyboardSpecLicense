@@ -125,8 +125,10 @@
             <div class="palette-group" data-category-group="firmware">
               <h3>ファームウェア (Firmware)</h3>
               <div class="pill-grid">
-                <button type="button" data-icon-id="firmware-qmk" data-category="firmware" data-label="QMK" data-abbr="QK" data-description="有線で広く使われる多機能OSSファームウェア。">QMK · QK</button>
-                <button type="button" data-icon-id="firmware-zmk" data-category="firmware" data-label="ZMK" data-abbr="ZM" data-description="無線や省電力構成に適したモダンOSSファームウェア。">ZMK · ZM</button>
+                <button type="button" data-icon-id="firmware-qmk" data-category="firmware" data-label="QMK" data-abbr="FW" data-description="有線で広く使われる多機能OSSファームウェア。">QMK · FW</button>
+                <button type="button" data-icon-id="firmware-zmk" data-category="firmware" data-label="ZMK" data-abbr="FW" data-description="無線や省電力構成に適したモダンOSSファームウェア。">ZMK · FW</button>
+                <button type="button" data-icon-id="firmware-via" data-category="firmware" data-label="VIA" data-abbr="FW" data-description="GUIでキーマップ編集ができる設定ツール。対応ファームで動作。">VIA · FW</button>
+                <button type="button" data-icon-id="firmware-vial" data-category="firmware" data-label="VIAL" data-abbr="FW" data-description="VIA互換の上位版。より多機能でセキュアなキーマップ管理が可能。">VIAL · FW</button>
                 <button type="button" class="ghost" data-custom-category="firmware">カスタム画像</button>
               </div>
               <div class="group-desc" data-desc-for="firmware">このカテゴリは未選択です。</div>
@@ -158,9 +160,13 @@
             <span class="hint">自動: メイン + 略称を " - " で連結</span>
           </div>
         </div>
+      </section>
 
-        <div class="field export">
-          <label>エクスポート</label>
+      <section class="panel preview" aria-label="プレビュー">
+        <div class="preview-canvas" id="preview-area">
+          <svg id="badge-svg" role="img" aria-label="KeySpec badge"></svg>
+        </div>
+        <div class="export-actions">
           <div class="row gap-sm wrap">
             <button data-png="800">PNG 800px</button>
             <button data-png="2000">PNG 2000px (印刷向け)</button>
@@ -172,12 +178,6 @@
             GitHub Pages にそのまま置ける構成。ダウンロードしたファイル名は
             `keyspec-badge.png` / `keyspec-badge.svg` 推奨。
           </p>
-        </div>
-      </section>
-
-      <section class="panel preview" aria-label="プレビュー">
-        <div class="preview-canvas" id="preview-area">
-          <svg id="badge-svg" role="img" aria-label="KeySpec badge"></svg>
         </div>
       </section>
     </main>

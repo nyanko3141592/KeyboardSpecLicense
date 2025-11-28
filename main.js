@@ -149,15 +149,29 @@ const palette = [
     id: 'firmware-qmk',
     category: 'firmware',
     label: 'QMK',
-    abbr: 'QK',
+    abbr: 'FW',
     description: '有線で広く使われる多機能OSSファームウェア。',
   },
   {
     id: 'firmware-zmk',
     category: 'firmware',
     label: 'ZMK',
-    abbr: 'ZM',
+    abbr: 'FW',
     description: '無線や省電力構成に適したモダンOSSファームウェア。',
+  },
+  {
+    id: 'firmware-via',
+    category: 'firmware',
+    label: 'VIA',
+    abbr: 'FW',
+    description: 'GUIでキーマップ編集ができる設定ツール。対応ファームで動作。',
+  },
+  {
+    id: 'firmware-vial',
+    category: 'firmware',
+    label: 'VIAL',
+    abbr: 'FW',
+    description: 'VIA互換の上位版。より多機能でセキュアなキーマップ管理が可能。',
   },
 
   // 8. 拡張機能 (Features)
@@ -176,6 +190,12 @@ const palette = [
     description: 'OLED/電子ペーパー等でレイヤー・バッテリー・ロゴを表示。',
   },
 ];
+
+// 固定順序でアイコンを並べるためのインデックスマップ
+const iconOrder = palette.reduce((acc, item, idx) => {
+  acc[item.id] = idx;
+  return acc;
+}, {});
 
 const selectedList = document.getElementById('selected-list');
 const svg = document.getElementById('badge-svg');
@@ -212,6 +232,42 @@ const iconFileMap = {
   'feature-ec': 'fram25_tiles/encoder.png',
   'feature-dp': 'fram25_tiles/display.png',
 };
+const iconDataUrlCache = {};
+let iconPreloadPromise = null;
+
+function fetchAsDataUrl(path) {
+  return fetch(path)
+    .then((res) => {
+      if (!res.ok) throw new Error(`failed to load ${path}`);
+      return res.blob();
+    })
+    .then(
+      (blob) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        })
+    );
+}
+
+function preloadIcons() {
+  if (iconPreloadPromise) return iconPreloadPromise;
+  const uniqueFiles = [...new Set(Object.values(iconFileMap))];
+  iconPreloadPromise = Promise.all(
+    uniqueFiles.map((file) =>
+      fetchAsDataUrl(`./public/${file}`)
+        .then((dataUrl) => {
+          iconDataUrlCache[file] = dataUrl;
+        })
+        .catch(() => {
+          // 失敗しても既存パスで表示されるので黙殺
+        })
+    )
+  );
+  return iconPreloadPromise;
+}
 const categoryOrder = [
   'shape',
   'layout',
@@ -399,7 +455,16 @@ function getVisualSlots() {
 function resolveIconHref(id) {
   if (state.customIconMap[id]) return state.customIconMap[id];
   const filename = iconFileMap[id] || `${id}.png`;
-  return `./public/${filename}`;
+  return iconDataUrlCache[filename] || `./public/${filename}`;
+}
+
+function renderIconOrText(item, cx, cy, innerR, clipId) {
+  // Firmwareカテゴリはテキスト表示（QMK/ZMK/VIA/VIALなど）
+  if (item.category === 'firmware') {
+    const label = item.label || item.id.toUpperCase();
+    return `<text x="${cx}" y="${cy + 2}" text-anchor="middle" font-family="${'Space Grotesk'}" font-size="28" font-weight="700" fill="#000" dominant-baseline="middle" clip-path="url(#${clipId})">${label}</text>`;
+  }
+  return `<image href="${resolveIconHref(item.id)}" x="${cx - innerR}" y="${cy - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice" />`;
 }
 
 function setTheme(theme) {
@@ -488,15 +553,24 @@ function renderBadge() {
 
   const circles = slots
     .map((slot, i) => {
+      const itemsSorted = slot.items.length > 1
+        ? [...slot.items].sort((a, b) => {
+            const ai = iconOrder[a.id] ?? 9999;
+            const bi = iconOrder[b.id] ?? 9999;
+            if (ai !== bi) return ai - bi;
+            return a.label.localeCompare(b.label);
+          })
+        : slot.items;
+
       const cx = attrStartX + i * attrSpacing;
       const innerR = attrRadius - 6;
-      const isMulti = slot.items.length > 1;
+      const isMulti = itemsSorted.length > 1;
       const clipRoot = `clip-${slot.category}-${i}`;
 
       const defs = isMulti
-        ? slot.items
+        ? itemsSorted
           .map((item, segIdx) => {
-            const segCount = slot.items.length;
+            const segCount = itemsSorted.length;
             const anglePer = (Math.PI * 2) / segCount;
             const start = -Math.PI / 2 + anglePer * segIdx;
             const end = start + anglePer;
@@ -507,20 +581,20 @@ function renderBadge() {
         : `<clipPath id="${clipRoot}"><circle cx="${cx}" cy="${attrRowY}" r="${innerR}" /></clipPath>`;
 
       const images = isMulti
-        ? slot.items
+        ? itemsSorted
           .map((item, segIdx) => {
             const id = `${clipRoot}-${segIdx}`;
-            return `<image href="${resolveIconHref(item.id)}" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice" />`;
+            return renderIconOrText(item, cx, attrRowY, innerR, id);
           })
           .join('')
-        : slot.items[0].id === 'pitch'
-          ? `<text class="mono" x="${cx}" y="${attrRowY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="28" font-weight="700" fill="${ink}" dominant-baseline="middle">${slot.items[0].value || slot.items[0].abbr}</text>`
-          : `<image href="${resolveIconHref(slot.items[0].id)}" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipRoot})" preserveAspectRatio="xMidYMid slice" />`;
+        : itemsSorted[0].id === 'pitch'
+          ? `<text class="mono" x="${cx}" y="${attrRowY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="28" font-weight="700" fill="${ink}" dominant-baseline="middle">${itemsSorted[0].value || itemsSorted[0].abbr}</text>`
+          : renderIconOrText(itemsSorted[0], cx, attrRowY, innerR, clipRoot);
 
       const spokes = isMulti
-        ? slot.items
+        ? itemsSorted
           .map((_, segIdx) => {
-            const segCount = slot.items.length;
+            const segCount = itemsSorted.length;
             const anglePer = (Math.PI * 2) / segCount;
             const angle = -Math.PI / 2 + anglePer * segIdx;
             const x = cx + innerR * Math.cos(angle);
@@ -541,7 +615,10 @@ function renderBadge() {
     })
     .join('');
 
-  const footerPieces = slots.map((slot) => slot.items.map((i) => formatAbbr(i.abbr)).filter(Boolean));
+  const footerPieces = slots.map((slot) => {
+    if (slot.category === 'firmware') return ['FW'];
+    return slot.items.map((i) => formatAbbr(i.abbr)).filter(Boolean);
+  });
 
   const svgMarkup = `
     <rect width="${width}" height="${canvasHeight}" fill="${bg}" />
@@ -665,14 +742,16 @@ async function ensureFontsReady() {
 }
 
 function downloadSvg() {
-  ensureFontsReady().then(() => {
+  Promise.all([ensureFontsReady(), preloadIcons()]).then(() => {
+    renderBadge(); // データURL反映
     const svgString = serializeSvg();
     downloadFile('keyspec-badge.svg', svgString, 'image/svg+xml');
   });
 }
 
 async function downloadPng(targetWidth) {
-  await ensureFontsReady();
+  await Promise.all([ensureFontsReady(), preloadIcons()]);
+  renderBadge(); // データURL反映
   const svgString = serializeSvg();
   const encoded = encodeURIComponent(svgString);
   const img = new Image();
@@ -784,6 +863,7 @@ function wireUI() {
 }
 
 function init() {
+  preloadIcons().then(renderBadge);
   bootstrapDefaults();
   updatePaletteUI();
   renderSelected();
