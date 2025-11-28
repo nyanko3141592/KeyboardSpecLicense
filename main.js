@@ -1,18 +1,44 @@
 const palette = [
+  // 1. 形状 (Shape)
   { id: 'shape-split', category: 'shape', label: 'Split', abbr: 'SP' },
   { id: 'shape-unibody', category: 'shape', label: 'Unibody', abbr: 'UB' },
-  { id: 'shape-alice', category: 'shape', label: 'Alice', abbr: 'AL' },
-  { id: 'layout-rs', category: 'layout', label: 'Row-Stag', abbr: 'RS' },
-  { id: 'layout-cs', category: 'layout', label: 'Col-Stag', abbr: 'CS' },
-  { id: 'layout-or', category: 'layout', label: 'Ortho', abbr: 'OR' },
+  { id: 'shape-macropad', category: 'shape', label: 'MacroPad', abbr: 'MP' },
+
+  // 2. スタッガード (Stagger)
+  { id: 'stagger-row', category: 'stagger', label: 'Row-staggered', abbr: 'RS' },
+  { id: 'stagger-column', category: 'stagger', label: 'Column-staggered', abbr: 'CS' },
+  { id: 'stagger-angle', category: 'stagger', label: 'Angle-staggered', abbr: 'AS' },
+  { id: 'stagger-matrix', category: 'stagger', label: 'Matrix-staggered', abbr: 'MS' },
+
+  // 3. 配列 (Layout)
+  { id: 'layout-rs', category: 'layout', label: 'Row-staggered', abbr: 'RS' },
+  { id: 'layout-cs', category: 'layout', label: 'Column-staggered', abbr: 'CS' },
+  { id: 'layout-or', category: 'layout', label: 'Ortholinear', abbr: 'OR' },
+  { id: 'layout-alice', category: 'layout', label: 'Alice / Arisu', abbr: 'AL' },
+  { id: 'layout-grin', category: 'layout', label: 'GRIN', abbr: 'GR' },
+
+  // 4. 接続 (Connect)
   { id: 'connect-wr', category: 'connect', label: 'Wired', abbr: 'WR' },
   { id: 'connect-wl', category: 'connect', label: 'Wireless', abbr: 'WL' },
-  { id: 'switch-mx', category: 'switch', label: 'MX Only', abbr: 'MX' },
-  { id: 'switch-ch', category: 'switch', label: 'Choc', abbr: 'CH' },
-  { id: 'switch-hs', category: 'switch', label: 'Hotswap', abbr: 'HS' },
-  { id: 'extra-tb', category: 'extra', label: 'Trackball', abbr: 'TB' },
-  { id: 'extra-ec', category: 'extra', label: 'Encoder', abbr: 'EC' },
-  { id: 'extra-dp', category: 'extra', label: 'Display', abbr: 'DP' },
+  { id: 'connect-hy', category: 'connect', label: 'Hybrid', abbr: 'HY' },
+
+  // 5. スイッチ・キーキャップ互換性 (Switch / Keycap Compatibility)
+  { id: 'compat-mx', category: 'compat', label: 'Cherry MX', abbr: 'MX' },
+  { id: 'compat-chocv1', category: 'compat', label: 'Kailh Choc v1', abbr: 'C1' },
+  { id: 'compat-chocv2', category: 'compat', label: 'Kailh Choc v2', abbr: 'C2' },
+
+  // 6. ポインティングデバイス (Pointing Device)
+  { id: 'pointing-tb', category: 'pointing', label: 'Trackball', abbr: 'TB' },
+  { id: 'pointing-tp', category: 'pointing', label: 'TrackPoint', abbr: 'TP' },
+  { id: 'pointing-td', category: 'pointing', label: 'Trackpad', abbr: 'TD' },
+
+  // 7. ファームウェア (Firmware)
+  { id: 'firmware-qmk', category: 'firmware', label: 'QMK', abbr: 'QK' },
+  { id: 'firmware-zmk', category: 'firmware', label: 'ZMK', abbr: 'ZM' },
+
+  // 8. 拡張機能 (Features)
+  { id: 'feature-ec', category: 'features', label: 'Encoder', abbr: 'EC' },
+  { id: 'feature-dp', category: 'features', label: 'Display', abbr: 'DP' },
 ];
 
 const state = {
@@ -29,15 +55,29 @@ const selectedList = document.getElementById('selected-list');
 const svg = document.getElementById('badge-svg');
 const themeChip = document.getElementById('theme-chip');
 const footerField = document.getElementById('footer-text');
-const categoryOrder = ['shape', 'pitch', 'layout', 'connect', 'switch', 'extra'];
+const categoryOrder = [
+  'shape',
+  'stagger',
+  'layout',
+  'pitch',
+  'connect',
+  'compat',
+  'pointing',
+  'firmware',
+  'features',
+];
 
 function bootstrapDefaults() {
   const defaults = [
     findIcon('shape-split'),
+    findIcon('stagger-row'),
+    findIcon('layout-rs'),
     { id: 'pitch', category: 'pitch', label: 'Pitch', abbr: state.pitchValue },
-    findIcon('layout-cs'),
     findIcon('connect-wl'),
-    findIcon('switch-mx'),
+    findIcon('compat-mx'),
+    findIcon('pointing-tb'),
+    findIcon('firmware-qmk'),
+    findIcon('feature-ec'),
   ].filter(Boolean);
   state.selectedIcons = defaults;
   state.footerText = buildFooterText();
@@ -49,13 +89,16 @@ function findIcon(id) {
 
 function renderPalette() {
   paletteBox.innerHTML = '';
-  const categories = ['shape', 'layout', 'connect', 'switch', 'extra'];
+  const categories = categoryOrder.filter((c) => c !== 'pitch');
   const titles = {
-    shape: 'Shape',
-    layout: 'Layout',
-    connect: 'Connect',
-    switch: 'Switch',
-    extra: 'Extra',
+    shape: '形状 (Shape)',
+    stagger: 'スタッガード (Stagger)',
+    layout: '配列 (Layout)',
+    connect: '接続 (Connect)',
+    compat: '互換性 (Switch / Keycap)',
+    pointing: 'ポインティング (Pointing)',
+    firmware: 'ファームウェア (Firmware)',
+    features: '拡張機能 (Features)',
   };
   categories.forEach((cat) => {
     const group = document.createElement('div');
