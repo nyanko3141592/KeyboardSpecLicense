@@ -164,6 +164,32 @@ textarea {
   gap: 8px;
 }
 
+.pitch-set.sub {
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.icon-replace {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+.upload-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--pill);
+  color: var(--pill-ink);
+  cursor: pointer;
+  font-weight: 600;
+}
+
 button {
   border: none;
   border-radius: 12px;

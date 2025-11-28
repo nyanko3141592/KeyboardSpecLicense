@@ -25,48 +25,20 @@ const palette = [
   // 2. スタッガード (Stagger)
   {
     id: 'stagger-row',
-    category: 'stagger',
+    category: 'layout',
     label: 'Row-staggered',
     abbr: 'RS',
     description: '横方向に段差をつけた一般的配列。通常キーボードから移行しやすい。',
   },
   {
     id: 'stagger-column',
-    category: 'stagger',
+    category: 'layout',
     label: 'Column-staggered',
     abbr: 'CS',
     description: '縦方向に段差をつけ指の長さに合わせた配列で、移動量を減らしやすい。',
   },
-  {
-    id: 'stagger-angle',
-    category: 'stagger',
-    label: 'Angle-staggered',
-    abbr: 'AS',
-    description: '列ごとに角度や位置を変え、手首の向きに合わせた配列。',
-  },
-  {
-    id: 'stagger-matrix',
-    category: 'stagger',
-    label: 'Matrix-staggered',
-    abbr: 'MS',
-    description: '格子をベースに一部のみずらしたハイブリッド配列。',
-  },
 
   // 3. 配列 (Layout)
-  {
-    id: 'layout-rs',
-    category: 'layout',
-    label: 'Row-staggered',
-    abbr: 'RS',
-    description: 'フルサイズ/TKL等で採用される横ずれ配列。',
-  },
-  {
-    id: 'layout-cs',
-    category: 'layout',
-    label: 'Column-staggered',
-    abbr: 'CS',
-    description: 'エルゴ分割系で多い縦ずれ配列。',
-  },
   {
     id: 'layout-or',
     category: 'layout',
@@ -196,6 +168,9 @@ const state = {
   mainLabel: '42',
   theme: 'light',
   pitchValue: '19mm',
+  pitchAbbr: 'KP',
+  mainImageUrl: '',
+  customIconMap: {},
   selectedIcons: [],
   footerText: '',
   footerIsCustom: false,
@@ -206,9 +181,18 @@ const selectedList = document.getElementById('selected-list');
 const svg = document.getElementById('badge-svg');
 const themeChip = document.getElementById('theme-chip');
 const footerField = document.getElementById('footer-text');
+const iconTargetSelect = document.getElementById('icon-target');
+const iconUrlInput = document.getElementById('icon-url');
+const iconFileInput = document.getElementById('icon-file');
+const iconFileMap = {
+  'firmware-qmk': 'firm-qmk.png',
+  'firmware-zmk': 'firm-zmk.png',
+  'compat-mx': 'switch-mx.png',
+  'feature-ec': 'extra-ec.png',
+  'feature-dp': 'extra-dp.png',
+};
 const categoryOrder = [
   'shape',
-  'stagger',
   'layout',
   'pitch',
   'connect',
@@ -223,8 +207,7 @@ function bootstrapDefaults() {
   const defaults = [
     findIcon('shape-split'),
     findIcon('stagger-row'),
-    findIcon('layout-rs'),
-    { id: 'pitch', category: 'pitch', label: 'Pitch', abbr: state.pitchValue },
+    { id: 'pitch', category: 'pitch', label: 'Pitch', abbr: state.pitchAbbr, value: state.pitchValue },
     findIcon('connect-wl'),
     findIcon('compat-mx'),
     findIcon('pointing-tb'),
@@ -241,10 +224,17 @@ function findIcon(id) {
 
 function renderPalette() {
   paletteBox.innerHTML = '';
+  if (iconTargetSelect && iconTargetSelect.childElementCount === 0) {
+    palette.forEach((i) => {
+      const opt = document.createElement('option');
+      opt.value = i.id;
+      opt.textContent = `${i.label} (${i.category})`;
+      iconTargetSelect.appendChild(opt);
+    });
+  }
   const categories = categoryOrder.filter((c) => c !== 'pitch');
   const titles = {
     shape: '形状 (Shape)',
-    stagger: 'スタッガード (Stagger)',
     layout: '配列 (Layout)',
     connect: '接続 (Connect)',
     compat: '互換性 (Switch / Keycap)',
@@ -320,9 +310,11 @@ function finalizeSelection() {
 
 function setPitch() {
   const value = document.getElementById('pitch-input').value.trim();
+  const abbr = document.getElementById('pitch-abbr').value.trim() || 'KP';
   if (!value) return;
   state.pitchValue = value;
-  const payload = { id: 'pitch', category: 'pitch', label: 'Pitch', abbr: value };
+  state.pitchAbbr = abbr;
+  const payload = { id: 'pitch', category: 'pitch', label: 'Pitch', abbr, value };
   const existingIndex = state.selectedIcons.findIndex((i) => i.category === 'pitch');
   if (existingIndex >= 0) {
     state.selectedIcons.splice(existingIndex, 1, payload);
@@ -382,6 +374,12 @@ function getVisualSlots() {
     }
   });
   return slots;
+}
+
+function resolveIconHref(id) {
+  if (state.customIconMap[id]) return state.customIconMap[id];
+  const filename = iconFileMap[id] || `${id}.png`;
+  return `./public/${filename}`;
 }
 
 function setTheme(theme) {
@@ -458,7 +456,6 @@ function renderBadge() {
     .map((slot, i) => {
       const cx = attrStartX + i * attrSpacing;
       const innerR = attrRadius - 6;
-      const hrefBase = 'public/';
       const isMulti = slot.items.length > 1;
       const clipRoot = `clip-${slot.category}-${i}`;
 
@@ -479,10 +476,12 @@ function renderBadge() {
         ? slot.items
             .map((item, segIdx) => {
               const id = `${clipRoot}-${segIdx}`;
-              return `<image href="${hrefBase}${item.id}.png" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice" />`;
+              return `<image href="${resolveIconHref(item.id)}" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice" />`;
             })
             .join('')
-        : `<image href="${hrefBase}${slot.items[0].id}.png" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipRoot})" preserveAspectRatio="xMidYMid slice" />`;
+        : slot.items[0].id === 'pitch'
+          ? `<text x="${cx}" y="${attrRowY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="28" font-weight="700" fill="${ink}" dominant-baseline="middle">${slot.items[0].value || slot.items[0].abbr}</text>`
+          : `<image href="${resolveIconHref(slot.items[0].id)}" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipRoot})" preserveAspectRatio="xMidYMid slice" />`;
 
       const spokes = isMulti
         ? slot.items
@@ -520,18 +519,26 @@ function renderBadge() {
           if (!lines.length) return '';
           const cx = attrStartX + idx * attrSpacing;
           const centerY = canvasHeight - bandHeight / 2;
-          const lineHeight = 26;
+          const maxBandInner = bandHeight * 0.8;
+          const fontSize = Math.min(26, Math.max(14, maxBandInner / lines.length));
+          const lineHeight = fontSize + 4;
           const startY = centerY - ((lines.length - 1) * lineHeight) / 2;
           const tspans = lines
-            .map((txt, lineIdx) => `<tspan x="${cx}" y="${startY + lineIdx * lineHeight}">${txt}</tspan>`)
+            .map(
+              (txt, lineIdx) =>
+                `<tspan x="${cx}" y="${startY + lineIdx * lineHeight}">${txt}</tspan>`
+            )
             .join('');
-          return `<text x="${cx}" y="${startY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="26" font-weight="700" fill="${bandText}">${tspans}</text>`;
+          return `<text x="${cx}" y="${startY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="${fontSize}" font-weight="700" fill="${bandText}">${tspans}</text>`;
         })
         .join('')}
       <circle cx="${mainCx}" cy="${mainCy}" r="${mainBgOuterRadius}" fill="${bg}" />
       <circle cx="${mainCx}" cy="${mainCy}" r="${mainBlackOuterRadius}" fill="${ink}" />
       <circle cx="${mainCx}" cy="${mainCy}" r="${mainWhiteRadius}" fill="#ffffff" />
-      <text x="${mainCx}" y="${mainCy + 14}" text-anchor="middle" font-family="${'Space Grotesk'}" font-size="36" font-weight="700" fill="${ink}">${state.mainLabel || '0'}</text>
+      ${state.mainImageUrl
+        ? `<defs><clipPath id="main-clip"><circle cx="${mainCx}" cy="${mainCy}" r="${mainWhiteRadius - 4}" /></clipPath></defs>
+           <image href="${state.mainImageUrl}" x="${mainCx - (mainWhiteRadius - 4)}" y="${mainCy - (mainWhiteRadius - 4)}" width="${(mainWhiteRadius - 4) * 2}" height="${(mainWhiteRadius - 4) * 2}" clip-path="url(#main-clip)" preserveAspectRatio="xMidYMid slice" />`
+        : `<text x="${mainCx}" y="${mainCy + 10}" text-anchor="middle" font-family="${'Space Grotesk'}" font-size="44" font-weight="700" fill="${ink}" dominant-baseline="middle">${state.mainLabel || '0'}</text>`}
       <rect width="${width}" height="${canvasHeight}" fill="none" stroke="${ink}" stroke-width="${border}" />
     </g>
   `;
@@ -547,6 +554,11 @@ function setMainLabel(value) {
   state.mainLabel = digits || '0';
   if (!state.footerIsCustom) state.footerText = buildFooterText();
   syncFooterField();
+  renderBadge();
+}
+
+function setMainImageUrl(value) {
+  state.mainImageUrl = value.trim();
   renderBadge();
 }
 
@@ -630,6 +642,41 @@ function copyText(text, btn) {
 function wireUI() {
   document.getElementById('main-label').addEventListener('input', (e) => {
     setMainLabel(e.target.value.toUpperCase());
+  });
+
+  document.getElementById('main-image-url').addEventListener('input', (e) => {
+    setMainImageUrl(e.target.value);
+  });
+
+  document.getElementById('set-icon-url').addEventListener('click', () => {
+    const id = iconTargetSelect.value;
+    const url = iconUrlInput.value.trim();
+    if (!id || !url) return;
+    state.customIconMap[id] = url;
+    renderBadge();
+    renderPalette();
+  });
+
+  document.getElementById('reset-icon-url').addEventListener('click', () => {
+    const id = iconTargetSelect.value;
+    if (!id) return;
+    delete state.customIconMap[id];
+    renderBadge();
+    renderPalette();
+  });
+
+  iconFileInput.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    const id = iconTargetSelect.value;
+    if (!file || !id) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      state.customIconMap[id] = reader.result;
+      renderBadge();
+      renderPalette();
+    };
+    reader.readAsDataURL(file);
+    iconFileInput.value = '';
   });
 
   document.querySelectorAll('.segmented button').forEach((btn) => {

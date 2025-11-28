@@ -28,7 +28,7 @@
     <main class="layout">
       <section class="panel controls" aria-label="設定フォーム">
         <div class="field">
-          <label for="main-label">メインアイコンのテキスト</label>
+          <label for="main-label">キー数（メイン表示）</label>
           <input
             id="main-label"
             type="text"
@@ -36,7 +36,29 @@
             placeholder="42"
             value="42"
           />
-          <p class="hint">例: 42 / 60% / TKL</p>
+          <p class="hint">例: 42 / 60% / TKL（画像未指定ならここを表示）</p>
+          <div class="field">
+            <label for="main-image-url">メインアイコン画像URL（任意）</label>
+            <input id="main-image-url" type="text" placeholder="https://example.com/icon.png" />
+            <p class="hint">指定するとキー数の代わりに画像を中央円に表示します</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>アイコン画像の置き換え（URL またはアップロード）</label>
+          <div class="icon-replace">
+            <select id="icon-target"></select>
+            <input id="icon-url" type="text" placeholder="https://example.com/your-icon.png" />
+            <div class="row gap-sm wrap">
+              <button id="set-icon-url">URLを反映</button>
+              <label class="upload-button">
+                ファイルを選択
+                <input id="icon-file" type="file" accept="image/*" hidden />
+              </label>
+              <button id="reset-icon-url" class="ghost">元に戻す</button>
+            </div>
+            <p class="hint">対象アイコンだけ差し替え可能。アップロードはローカルでBase64化して適用します。</p>
+          </div>
         </div>
 
         <div class="field inline">
@@ -53,7 +75,11 @@
               <input id="pitch-input" type="text" value="19mm" />
               <button id="set-pitch">セット</button>
             </div>
-            <p class="hint">19mm / 19.05 / 17x18 など文字でOK</p>
+            <div class="pitch-set sub">
+              <input id="pitch-abbr" type="text" value="KP" maxlength="6" />
+              <span class="hint">帯テキスト（デフォルト KP / 任意文字可）</span>
+            </div>
+            <p class="hint">ピッチは自由入力。下帯は任意テキストを設定可。</p>
           </div>
         </div>
 
