@@ -1,169 +1,3 @@
-const palette = [
-  // 1. 形状 (Shape)
-  {
-    id: 'shape-split',
-    category: 'shape',
-    label: 'Split',
-    abbr: 'SP',
-    description: '左右ユニットが分離し肩幅に合わせられるため、手首負担を減らしやすい。',
-  },
-  {
-    id: 'shape-unibody',
-    category: 'shape',
-    label: 'Unibody',
-    abbr: 'UB',
-    description: '一枚板の筐体で取り回しが良く、剛性や打鍵音を安定させやすい。',
-  },
-  {
-    id: 'shape-macropad',
-    category: 'shape',
-    label: 'MacroPad',
-    abbr: 'MP',
-    description: 'テンキー/ファンクションなど補助用途に特化した小型キーボード。',
-  },
-
-  // 2. スタッガード (Stagger)
-  {
-    id: 'stagger-row',
-    category: 'layout',
-    label: 'Row-staggered',
-    abbr: 'RS',
-    description: '横方向に段差をつけた一般的配列。通常キーボードから移行しやすい。',
-  },
-  {
-    id: 'stagger-column',
-    category: 'layout',
-    label: 'Column-staggered',
-    abbr: 'CS',
-    description: '縦方向に段差をつけ指の長さに合わせた配列で、移動量を減らしやすい。',
-  },
-
-  // 3. 配列 (Layout)
-  {
-    id: 'layout-or',
-    category: 'layout',
-    label: 'Ortholinear',
-    abbr: 'OR',
-    description: 'キーが格子状に縦横まっすぐ並ぶ配列。',
-  },
-  {
-    id: 'layout-alice',
-    category: 'layout',
-    label: 'Alice / Arisu',
-    abbr: 'AL',
-    description: '一体型で中央が開いたハの字配列。自然な手首角度を取りやすい。',
-  },
-  {
-    id: 'layout-grin',
-    category: 'layout',
-    label: 'GRIN',
-    abbr: 'GR',
-    description: 'エルゴ性を重視した独自特殊配列。',
-  },
-
-  // 4. 接続 (Connect)
-  {
-    id: 'connect-wr',
-    category: 'connect',
-    label: 'Wired',
-    abbr: 'WR',
-    description: 'USBなど有線で接続し、電源・通信が安定。',
-  },
-  {
-    id: 'connect-wl',
-    category: 'connect',
-    label: 'Wireless',
-    abbr: 'WL',
-    description: 'Bluetooth/2.4GHzなど完全無線。ケーブルレス運用。',
-  },
-  {
-    id: 'connect-halfwired',
-    category: 'connect',
-    label: 'HalfWired',
-    abbr: 'HW',
-    description:
-      'PCとの通信は無線だが、それ以外の場所でケーブル接続が必要。主にBluetooth接続の分割キーボードで採用される構成。',
-  },
-
-  // 5. スイッチ・キーキャップ互換性 (Switch / Keycap Compatibility)
-  {
-    id: 'compat-mx',
-    category: 'compat',
-    label: 'Cherry MX',
-    abbr: 'MX',
-    description: '十字軸。一般的なMX規格キーキャップと互換性がある。',
-  },
-  {
-    id: 'compat-chocv1',
-    category: 'compat',
-    label: 'Kailh Choc v1',
-    abbr: 'C1',
-    description: '薄型Choc v1専用。MXやChoc v2とは非互換のロープロ仕様。',
-  },
-  {
-    id: 'compat-chocv2',
-    category: 'compat',
-    label: 'Kailh Choc v2',
-    abbr: 'C2',
-    description: 'Choc v2専用キーキャップと互換。v1/MXとは非互換。',
-  },
-
-  // 6. ポインティングデバイス (Pointing Device)
-  {
-    id: 'pointing-tb',
-    category: 'pointing',
-    label: 'Trackball',
-    abbr: 'TB',
-    description: '親指や指先でボールを回しホームポジションからカーソル操作。',
-  },
-  {
-    id: 'pointing-tp',
-    category: 'pointing',
-    label: 'TrackPoint',
-    abbr: 'TP',
-    description: 'キー間のスティックで小さな力でも精密にカーソル操作できる。',
-  },
-  {
-    id: 'pointing-td',
-    category: 'pointing',
-    label: 'Trackpad',
-    abbr: 'TD',
-    description: '指でなぞりカーソル移動やジェスチャー操作が可能。',
-  },
-
-  // 7. ファームウェア (Firmware)
-  {
-    id: 'firmware-qmk',
-    category: 'firmware',
-    label: 'QMK',
-    abbr: 'QK',
-    description: '有線で広く使われる多機能OSSファームウェア。',
-  },
-  {
-    id: 'firmware-zmk',
-    category: 'firmware',
-    label: 'ZMK',
-    abbr: 'ZM',
-    description: '無線や省電力構成に適したモダンOSSファームウェア。',
-  },
-
-  // 8. 拡張機能 (Features)
-  {
-    id: 'feature-ec',
-    category: 'features',
-    label: 'Encoder',
-    abbr: 'EC',
-    description: '回転ノブで音量/スクロール/レイヤー切替などに割り当て可能。',
-  },
-  {
-    id: 'feature-dp',
-    category: 'features',
-    label: 'Display',
-    abbr: 'DP',
-    description: 'OLED/電子ペーパー等でレイヤー・バッテリー・ロゴを表示。',
-  },
-];
-
 const state = {
   mainLabel: '42',
   theme: 'light',
@@ -176,7 +10,15 @@ const state = {
   footerIsCustom: false,
 };
 
-const paletteBox = document.getElementById('palette');
+const paletteButtons = Array.from(document.querySelectorAll('[data-icon-id]'));
+const palette = paletteButtons.map((btn) => ({
+  id: btn.dataset.iconId,
+  category: btn.dataset.category,
+  label: btn.dataset.label,
+  abbr: btn.dataset.abbr,
+  description: btn.dataset.description || '',
+}));
+
 const selectedList = document.getElementById('selected-list');
 const svg = document.getElementById('badge-svg');
 const footerField = document.getElementById('footer-text');
@@ -247,60 +89,29 @@ function findIcon(id) {
   return palette.find((p) => p.id === id);
 }
 
-function renderPalette() {
-  paletteBox.innerHTML = '';
-  const categories = categoryOrder.filter((c) => c !== 'pitch');
-  const titles = {
-    shape: '形状 (Shape)',
-    layout: '配列 (Layout)',
-    connect: '接続 (Connect)',
-    compat: '互換性 (Switch / Keycap)',
-    pointing: 'ポインティング (Pointing)',
-    firmware: 'ファームウェア (Firmware)',
-    features: '拡張機能 (Features)',
-  };
-  categories.forEach((cat) => {
-    const group = document.createElement('div');
-    group.className = 'palette-group';
-    const h = document.createElement('h3');
-    h.textContent = titles[cat];
-    group.appendChild(h);
-    const grid = document.createElement('div');
-    grid.className = 'pill-grid';
-    palette
-      .filter((i) => i.category === cat)
-      .forEach((icon) => {
-        const btn = document.createElement('button');
-        btn.textContent = `${icon.label} · ${icon.abbr}`;
-        btn.dataset.id = icon.id;
-        btn.classList.toggle('active', isSelected(icon.id));
-        btn.addEventListener('click', () => toggleIcon(icon));
-        grid.appendChild(btn);
-      });
+function updatePaletteUI() {
+  const selectedIds = new Set(state.selectedIcons.map((i) => i.id));
 
-    // custom image option per category
-    const customBtn = document.createElement('button');
-    customBtn.textContent = 'カスタム画像';
-    customBtn.classList.add('ghost');
-    const selectedCustom = state.selectedIcons.find((i) => i.id === `custom-${cat}`);
-    customBtn.classList.toggle('active', Boolean(selectedCustom));
-    customBtn.addEventListener('click', () => startCustomIcon(cat));
-    grid.appendChild(customBtn);
-    group.appendChild(grid);
+  paletteButtons.forEach((btn) => {
+    btn.classList.toggle('active', selectedIds.has(btn.dataset.iconId));
+  });
 
+  document.querySelectorAll('[data-custom-category]').forEach((btn) => {
+    const cat = btn.dataset.customCategory;
+    const hasCustom = state.selectedIcons.some((i) => i.id === `custom-${cat}`);
+    btn.classList.toggle('active', hasCustom);
+  });
+
+  document.querySelectorAll('[data-desc-for]').forEach((descEl) => {
+    const cat = descEl.dataset.descFor;
     const selected = state.selectedIcons.filter((i) => i.category === cat);
-    const desc = document.createElement('div');
-    desc.className = 'group-desc';
     if (selected.length) {
-      desc.innerHTML = selected
+      descEl.innerHTML = selected
         .map((s) => `<div>${s.label} (${s.abbr}) — ${s.description || ''}</div>`)
         .join('');
     } else {
-      desc.textContent = 'このカテゴリは未選択です。';
+      descEl.textContent = 'このカテゴリは未選択です。';
     }
-    group.appendChild(desc);
-
-    paletteBox.appendChild(group);
   });
 }
 
@@ -328,7 +139,7 @@ function toggleIcon(icon) {
 
 function finalizeSelection() {
   if (!state.footerIsCustom) state.footerText = buildFooterText();
-  renderPalette();
+  updatePaletteUI();
   renderSelected();
   renderBadge();
   syncFooterField();
@@ -370,7 +181,7 @@ function renderSelected() {
       if (!state.footerIsCustom) state.footerText = buildFooterText();
       renderSelected();
       renderBadge();
-      renderPalette();
+      updatePaletteUI();
       syncFooterField();
     });
 
@@ -704,39 +515,15 @@ function wireUI() {
     renderBadge();
   });
 
-  paletteBox.addEventListener('click', (e) => {
-    const applyId = e.target.dataset.iconApply;
-    const resetId = e.target.dataset.iconReset;
-    if (applyId) {
-      const input = paletteBox.querySelector(`input[data-icon-url=\"${applyId}\"]`);
-      const url = input?.value.trim();
-      if (url) {
-        state.customIconMap[applyId] = url;
-        renderBadge();
-        renderPalette();
-      }
-    }
-    if (resetId) {
-      delete state.customIconMap[resetId];
-      renderBadge();
-      renderPalette();
-    }
+  paletteButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const icon = findIcon(btn.dataset.iconId);
+      if (icon) toggleIcon(icon);
+    });
   });
 
-  paletteBox.addEventListener('change', (e) => {
-    const fileId = e.target.dataset.iconFile;
-    if (fileId) {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        state.customIconMap[fileId] = reader.result;
-        renderBadge();
-        renderPalette();
-      };
-      reader.readAsDataURL(file);
-      e.target.value = '';
-    }
+  document.querySelectorAll('[data-custom-category]').forEach((btn) => {
+    btn.addEventListener('click', () => startCustomIcon(btn.dataset.customCategory));
   });
 
   document.querySelectorAll('.segmented button').forEach((btn) => {
@@ -775,7 +562,7 @@ function wireUI() {
 
 function init() {
   bootstrapDefaults();
-  renderPalette();
+  updatePaletteUI();
   renderSelected();
   renderBadge();
   syncFooterField();
