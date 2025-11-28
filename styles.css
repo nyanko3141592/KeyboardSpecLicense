@@ -727,6 +727,37 @@ button.ghost:hover {
   transition: border-color 300ms ease;
 }
 
+.floating-download {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  min-width: 72px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  padding: 0;
+  font-weight: 700;
+  font-size: 13px;
+  background: var(--accent);
+  color: var(--pill-ink-active);
+  box-shadow: var(--shadow-md);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  letter-spacing: 0.02em;
+}
+
+.floating-download:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: var(--accent-hover);
+}
+
+.floating-download:active {
+  transform: translateY(0);
+}
+
 .export-actions {
   margin-top: 16px;
   padding: 16px;
@@ -744,6 +775,11 @@ button.ghost:hover {
 .export-actions .hint {
   justify-content: center;
   text-align: center;
+}
+
+/* remove unused export card on desktop (kept for structure safety if needed later) */
+.export-actions {
+  display: none;
 }
 
 .preview-canvas:hover {

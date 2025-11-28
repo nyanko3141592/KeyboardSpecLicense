@@ -165,19 +165,7 @@
       <section class="panel preview" aria-label="プレビュー">
         <div class="preview-canvas" id="preview-area">
           <svg id="badge-svg" role="img" aria-label="KeySpec badge"></svg>
-        </div>
-        <div class="export-actions">
-          <div class="row gap-sm wrap">
-            <button data-png="800">PNG 800px</button>
-            <button data-png="2000">PNG 2000px (印刷向け)</button>
-            <button id="download-svg">SVG</button>
-            <button id="copy-markdown" class="ghost">Markdownをコピー</button>
-            <button id="copy-html" class="ghost">HTMLをコピー</button>
-          </div>
-          <p class="hint">
-            GitHub Pages にそのまま置ける構成。ダウンロードしたファイル名は
-            `keyspec-badge.png` / `keyspec-badge.svg` 推奨。
-          </p>
+          <button id="download-image" class="floating-download" aria-label="画像を保存">保存</button>
         </div>
       </section>
     </main>

@@ -837,19 +837,8 @@ function wireUI() {
   footerField.addEventListener('input', (e) => handleFooterChange(e.target.value));
   document.getElementById('reset-footer').addEventListener('click', resetFooter);
 
-  document.getElementById('download-svg').addEventListener('click', downloadSvg);
-  document.querySelectorAll('button[data-png]').forEach((btn) => {
-    btn.addEventListener('click', () => downloadPng(Number(btn.dataset.png)));
-  });
-
-  document.getElementById('copy-markdown').addEventListener('click', (e) => {
-    const md = '![KeySpec badge](./keyspec-badge.png)';
-    copyText(md, e.target);
-  });
-  document.getElementById('copy-html').addEventListener('click', (e) => {
-    const html = '<img src="./keyspec-badge.png" alt="KeySpec badge" width="800" />';
-    copyText(html, e.target);
-  });
+  const downloadImgBtn = document.getElementById('download-image');
+  if (downloadImgBtn) downloadImgBtn.addEventListener('click', () => downloadPng(2000));
 
   customIconFileInput.addEventListener('change', (e) => {
     const cat = customIconFileInput.dataset.cat;
