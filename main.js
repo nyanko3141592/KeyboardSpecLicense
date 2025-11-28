@@ -179,7 +179,6 @@ const state = {
 const paletteBox = document.getElementById('palette');
 const selectedList = document.getElementById('selected-list');
 const svg = document.getElementById('badge-svg');
-const themeChip = document.getElementById('theme-chip');
 const footerField = document.getElementById('footer-text');
 const mainImageFileInput = document.getElementById('main-image-file');
 const customIconFileInput = document.getElementById('custom-icon-file');
@@ -281,7 +280,7 @@ function renderPalette() {
 
     // custom image option per category
     const customBtn = document.createElement('button');
-    customBtn.textContent = 'カスタム画像を選ぶ';
+    customBtn.textContent = 'カスタム画像';
     customBtn.classList.add('ghost');
     const selectedCustom = state.selectedIcons.find((i) => i.id === `custom-${cat}`);
     customBtn.classList.toggle('active', Boolean(selectedCustom));
@@ -412,11 +411,25 @@ function resolveIconHref(id) {
 function setTheme(theme) {
   state.theme = theme;
   document.body.classList.toggle('dark', theme === 'dark');
+
+  // Update fixed toggle button
+  const toggleBtn = document.getElementById('theme-toggle-btn');
+  const icon = toggleBtn?.querySelector('.theme-icon');
+  if (icon) {
+    icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+  }
+
+  // Update segmented buttons if they exist
   document.querySelectorAll('.segmented button').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.theme === theme);
   });
-  themeChip.textContent = theme.toUpperCase();
+
   renderBadge();
+}
+
+function toggleTheme() {
+  const newTheme = state.theme === 'light' ? 'dark' : 'light';
+  setTheme(newTheme);
 }
 
 function formatAbbr(abbr) {
@@ -488,39 +501,39 @@ function renderBadge() {
 
       const defs = isMulti
         ? slot.items
-            .map((item, segIdx) => {
-              const segCount = slot.items.length;
-              const anglePer = (Math.PI * 2) / segCount;
-              const start = -Math.PI / 2 + anglePer * segIdx;
-              const end = start + anglePer;
-              const id = `${clipRoot}-${segIdx}`;
-              return `<clipPath id="${id}"><path d="${describeWedge(cx, attrRowY, innerR, start, end)}" /></clipPath>`;
-            })
-            .join('')
+          .map((item, segIdx) => {
+            const segCount = slot.items.length;
+            const anglePer = (Math.PI * 2) / segCount;
+            const start = -Math.PI / 2 + anglePer * segIdx;
+            const end = start + anglePer;
+            const id = `${clipRoot}-${segIdx}`;
+            return `<clipPath id="${id}"><path d="${describeWedge(cx, attrRowY, innerR, start, end)}" /></clipPath>`;
+          })
+          .join('')
         : `<clipPath id="${clipRoot}"><circle cx="${cx}" cy="${attrRowY}" r="${innerR}" /></clipPath>`;
 
       const images = isMulti
         ? slot.items
-            .map((item, segIdx) => {
-              const id = `${clipRoot}-${segIdx}`;
-              return `<image href="${resolveIconHref(item.id)}" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice" />`;
-            })
-            .join('')
+          .map((item, segIdx) => {
+            const id = `${clipRoot}-${segIdx}`;
+            return `<image href="${resolveIconHref(item.id)}" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice" />`;
+          })
+          .join('')
         : slot.items[0].id === 'pitch'
           ? `<text x="${cx}" y="${attrRowY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="28" font-weight="700" fill="${ink}" dominant-baseline="middle">${slot.items[0].value || slot.items[0].abbr}</text>`
           : `<image href="${resolveIconHref(slot.items[0].id)}" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipRoot})" preserveAspectRatio="xMidYMid slice" />`;
 
       const spokes = isMulti
         ? slot.items
-            .map((_, segIdx) => {
-              const segCount = slot.items.length;
-              const anglePer = (Math.PI * 2) / segCount;
-              const angle = -Math.PI / 2 + anglePer * segIdx;
-              const x = cx + innerR * Math.cos(angle);
-              const y = attrRowY + innerR * Math.sin(angle);
-              return `<line x1="${cx}" y1="${attrRowY}" x2="${x}" y2="${y}" stroke="${ink}" stroke-width="1" />`;
-            })
-            .join('')
+          .map((_, segIdx) => {
+            const segCount = slot.items.length;
+            const anglePer = (Math.PI * 2) / segCount;
+            const angle = -Math.PI / 2 + anglePer * segIdx;
+            const x = cx + innerR * Math.cos(angle);
+            const y = attrRowY + innerR * Math.sin(angle);
+            return `<line x1="${cx}" y1="${attrRowY}" x2="${x}" y2="${y}" stroke="${ink}" stroke-width="1" />`;
+          })
+          .join('')
         : '';
 
       return `
@@ -542,30 +555,30 @@ function renderBadge() {
       ${circles}
       <rect x="0" y="${canvasHeight - bandHeight}" width="${width}" height="${bandHeight}" fill="${band}" />
       ${footerPieces
-        .map((lines, idx) => {
-          if (!lines.length) return '';
-          const cx = attrStartX + idx * attrSpacing;
-          const centerY = canvasHeight - bandHeight / 2;
-          const maxBandInner = bandHeight * 0.8;
-          const fontSize = Math.min(26, Math.max(14, maxBandInner / lines.length));
-          const lineHeight = fontSize + 4;
-          const startY = centerY - ((lines.length - 1) * lineHeight) / 2;
-          const tspans = lines
-            .map(
-              (txt, lineIdx) =>
-                `<tspan x="${cx}" y="${startY + lineIdx * lineHeight}">${txt}</tspan>`
-            )
-            .join('');
-          return `<text x="${cx}" y="${startY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="${fontSize}" font-weight="700" fill="${bandText}">${tspans}</text>`;
-        })
-        .join('')}
+      .map((lines, idx) => {
+        if (!lines.length) return '';
+        const cx = attrStartX + idx * attrSpacing;
+        const centerY = canvasHeight - bandHeight / 2;
+        const maxBandInner = bandHeight * 0.8;
+        const fontSize = Math.min(26, Math.max(14, maxBandInner / lines.length));
+        const lineHeight = fontSize + 4;
+        const startY = centerY - ((lines.length - 1) * lineHeight) / 2;
+        const tspans = lines
+          .map(
+            (txt, lineIdx) =>
+              `<tspan x="${cx}" y="${startY + lineIdx * lineHeight}">${txt}</tspan>`
+          )
+          .join('');
+        return `<text x="${cx}" y="${startY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="${fontSize}" font-weight="700" fill="${bandText}">${tspans}</text>`;
+      })
+      .join('')}
       <circle cx="${mainCx}" cy="${mainCy}" r="${mainBgOuterRadius}" fill="${bg}" />
       <circle cx="${mainCx}" cy="${mainCy}" r="${mainBlackOuterRadius}" fill="${ink}" />
       <circle cx="${mainCx}" cy="${mainCy}" r="${mainWhiteRadius}" fill="#ffffff" />
       ${state.mainImageUrl
-        ? `<defs><clipPath id="main-clip"><circle cx="${mainCx}" cy="${mainCy}" r="${mainWhiteRadius - 4}" /></clipPath></defs>
+      ? `<defs><clipPath id="main-clip"><circle cx="${mainCx}" cy="${mainCy}" r="${mainWhiteRadius - 4}" /></clipPath></defs>
            <image href="${state.mainImageUrl}" x="${mainCx - (mainWhiteRadius - 4)}" y="${mainCy - (mainWhiteRadius - 4)}" width="${(mainWhiteRadius - 4) * 2}" height="${(mainWhiteRadius - 4) * 2}" clip-path="url(#main-clip)" preserveAspectRatio="xMidYMid slice" />`
-        : `<text x="${mainCx}" y="${mainCy + 10}" text-anchor="middle" font-family="${'Space Grotesk'}" font-size="44" font-weight="700" fill="${ink}" dominant-baseline="middle">${state.mainLabel || '0'}</text>`}
+      : `<text x="${mainCx}" y="${mainCy + 10}" text-anchor="middle" font-family="${'Space Grotesk'}" font-size="44" font-weight="700" fill="${ink}" dominant-baseline="middle">${state.mainLabel || '0'}</text>`}
       <rect width="${width}" height="${canvasHeight}" fill="none" stroke="${ink}" stroke-width="${border}" />
     </g>
   `;
@@ -573,7 +586,7 @@ function renderBadge() {
   svg.setAttribute('viewBox', `0 0 ${width} ${canvasHeight}`);
   svg.setAttribute('width', width);
   svg.setAttribute('height', canvasHeight);
-svg.innerHTML = svgMarkup;
+  svg.innerHTML = svgMarkup;
 }
 
 function setMainLabel(value) {
@@ -667,6 +680,12 @@ function copyText(text, btn) {
 
 // Event wiring
 function wireUI() {
+  // Theme toggle button
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', toggleTheme);
+  }
+
   document.getElementById('main-label').addEventListener('input', (e) => {
     setMainLabel(e.target.value.toUpperCase());
   });

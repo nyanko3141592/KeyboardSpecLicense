@@ -13,16 +13,18 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <button class="theme-toggle-fixed" id="theme-toggle-btn" aria-label="テーマ切り替え">
+      <span class="theme-icon">☀️</span>
+    </button>
+
     <header class="topbar">
       <div>
         <p class="eyebrow">KeySpec Generator</p>
         <h1>自作キーボードのスペックバッジを即生成</h1>
         <p class="lede">
-          左のフォームを触ると右のバッジがリアルタイムで更新。PNG/SVGをそのまま
-          GitHub Pages から配布できます。
+          左のフォームを設定すると右のバッジがリアルタイムで更新されます。
         </p>
       </div>
-      <div class="badge-chip">MVP build</div>
     </header>
 
     <main class="layout">
@@ -47,26 +49,17 @@
           </div>
         </div>
 
-        <div class="field inline">
-          <div>
-            <label>テーマ</label>
-            <div class="segmented" role="group" aria-label="テーマ切り替え">
-              <button data-theme="light" class="active">ライト</button>
-              <button data-theme="dark">ダーク</button>
-            </div>
+        <div class="field">
+          <label for="pitch-input">キーピッチ</label>
+          <div class="pitch-set">
+            <input id="pitch-input" type="text" value="19mm" />
+            <button id="set-pitch">セット</button>
           </div>
-          <div>
-            <label for="pitch-input">キーピッチ</label>
-            <div class="pitch-set">
-              <input id="pitch-input" type="text" value="19mm" />
-              <button id="set-pitch">セット</button>
-            </div>
-            <div class="pitch-set sub">
-              <input id="pitch-abbr" type="text" value="KP" maxlength="6" />
-              <span class="hint">帯テキスト（デフォルト KP / 任意文字可）</span>
-            </div>
-            <p class="hint">ピッチは自由入力。下帯は任意テキストを設定可。</p>
+          <div class="pitch-set sub">
+            <input id="pitch-abbr" type="text" value="KP" maxlength="6" />
+            <span class="hint">帯テキスト（デフォルト KP / 任意文字可）</span>
           </div>
+          <p class="hint">ピッチは自由入力。下帯は任意テキストを設定可。</p>
         </div>
 
         <div class="field">
@@ -106,25 +99,12 @@
       </section>
 
       <section class="panel preview" aria-label="プレビュー">
-        <div class="preview-head">
-          <div>
-            <p class="eyebrow">リアルタイムプレビュー</p>
-            <h2>Badge Live Preview</h2>
-          </div>
-          <div class="theme-chip" id="theme-chip">LIGHT</div>
-        </div>
         <div class="preview-canvas" id="preview-area">
           <svg id="badge-svg" role="img" aria-label="KeySpec badge"></svg>
         </div>
       </section>
     </main>
 
-    <footer class="footnote">
-      <p>
-        プレースホルダーアイコン: <code>public/placeholder-icon.png</code> を差し替えてください。
-        GitHub Pages 用にビルド不要のシングルページ構成です。
-      </p>
-    </footer>
 
     <script type="module" src="main.js"></script>
     <input id="custom-icon-file" type="file" accept="image/*" hidden />
