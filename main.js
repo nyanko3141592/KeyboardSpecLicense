@@ -1,44 +1,194 @@
 const palette = [
   // 1. 形状 (Shape)
-  { id: 'shape-split', category: 'shape', label: 'Split', abbr: 'SP' },
-  { id: 'shape-unibody', category: 'shape', label: 'Unibody', abbr: 'UB' },
-  { id: 'shape-macropad', category: 'shape', label: 'MacroPad', abbr: 'MP' },
+  {
+    id: 'shape-split',
+    category: 'shape',
+    label: 'Split',
+    abbr: 'SP',
+    description: '左右ユニットが分離し肩幅に合わせられるため、手首負担を減らしやすい。',
+  },
+  {
+    id: 'shape-unibody',
+    category: 'shape',
+    label: 'Unibody',
+    abbr: 'UB',
+    description: '一枚板の筐体で取り回しが良く、剛性や打鍵音を安定させやすい。',
+  },
+  {
+    id: 'shape-macropad',
+    category: 'shape',
+    label: 'MacroPad',
+    abbr: 'MP',
+    description: 'テンキー/ファンクションなど補助用途に特化した小型キーボード。',
+  },
 
   // 2. スタッガード (Stagger)
-  { id: 'stagger-row', category: 'stagger', label: 'Row-staggered', abbr: 'RS' },
-  { id: 'stagger-column', category: 'stagger', label: 'Column-staggered', abbr: 'CS' },
-  { id: 'stagger-angle', category: 'stagger', label: 'Angle-staggered', abbr: 'AS' },
-  { id: 'stagger-matrix', category: 'stagger', label: 'Matrix-staggered', abbr: 'MS' },
+  {
+    id: 'stagger-row',
+    category: 'stagger',
+    label: 'Row-staggered',
+    abbr: 'RS',
+    description: '横方向に段差をつけた一般的配列。通常キーボードから移行しやすい。',
+  },
+  {
+    id: 'stagger-column',
+    category: 'stagger',
+    label: 'Column-staggered',
+    abbr: 'CS',
+    description: '縦方向に段差をつけ指の長さに合わせた配列で、移動量を減らしやすい。',
+  },
+  {
+    id: 'stagger-angle',
+    category: 'stagger',
+    label: 'Angle-staggered',
+    abbr: 'AS',
+    description: '列ごとに角度や位置を変え、手首の向きに合わせた配列。',
+  },
+  {
+    id: 'stagger-matrix',
+    category: 'stagger',
+    label: 'Matrix-staggered',
+    abbr: 'MS',
+    description: '格子をベースに一部のみずらしたハイブリッド配列。',
+  },
 
   // 3. 配列 (Layout)
-  { id: 'layout-rs', category: 'layout', label: 'Row-staggered', abbr: 'RS' },
-  { id: 'layout-cs', category: 'layout', label: 'Column-staggered', abbr: 'CS' },
-  { id: 'layout-or', category: 'layout', label: 'Ortholinear', abbr: 'OR' },
-  { id: 'layout-alice', category: 'layout', label: 'Alice / Arisu', abbr: 'AL' },
-  { id: 'layout-grin', category: 'layout', label: 'GRIN', abbr: 'GR' },
+  {
+    id: 'layout-rs',
+    category: 'layout',
+    label: 'Row-staggered',
+    abbr: 'RS',
+    description: 'フルサイズ/TKL等で採用される横ずれ配列。',
+  },
+  {
+    id: 'layout-cs',
+    category: 'layout',
+    label: 'Column-staggered',
+    abbr: 'CS',
+    description: 'エルゴ分割系で多い縦ずれ配列。',
+  },
+  {
+    id: 'layout-or',
+    category: 'layout',
+    label: 'Ortholinear',
+    abbr: 'OR',
+    description: 'キーが格子状に縦横まっすぐ並ぶ配列。',
+  },
+  {
+    id: 'layout-alice',
+    category: 'layout',
+    label: 'Alice / Arisu',
+    abbr: 'AL',
+    description: '一体型で中央が開いたハの字配列。自然な手首角度を取りやすい。',
+  },
+  {
+    id: 'layout-grin',
+    category: 'layout',
+    label: 'GRIN',
+    abbr: 'GR',
+    description: 'エルゴ性を重視した独自特殊配列。',
+  },
 
   // 4. 接続 (Connect)
-  { id: 'connect-wr', category: 'connect', label: 'Wired', abbr: 'WR' },
-  { id: 'connect-wl', category: 'connect', label: 'Wireless', abbr: 'WL' },
-  { id: 'connect-hy', category: 'connect', label: 'Hybrid', abbr: 'HY' },
+  {
+    id: 'connect-wr',
+    category: 'connect',
+    label: 'Wired',
+    abbr: 'WR',
+    description: 'USBなど有線で接続し、電源・通信が安定。',
+  },
+  {
+    id: 'connect-wl',
+    category: 'connect',
+    label: 'Wireless',
+    abbr: 'WL',
+    description: 'Bluetooth/2.4GHzなど完全無線。ケーブルレス運用。',
+  },
+  {
+    id: 'connect-hy',
+    category: 'connect',
+    label: 'Hybrid',
+    abbr: 'HY',
+    description: 'PCとは無線、左右ユニット間のみ有線などのハイブリッド。',
+  },
 
   // 5. スイッチ・キーキャップ互換性 (Switch / Keycap Compatibility)
-  { id: 'compat-mx', category: 'compat', label: 'Cherry MX', abbr: 'MX' },
-  { id: 'compat-chocv1', category: 'compat', label: 'Kailh Choc v1', abbr: 'C1' },
-  { id: 'compat-chocv2', category: 'compat', label: 'Kailh Choc v2', abbr: 'C2' },
+  {
+    id: 'compat-mx',
+    category: 'compat',
+    label: 'Cherry MX',
+    abbr: 'MX',
+    description: '十字軸。一般的なMX規格キーキャップと互換性がある。',
+  },
+  {
+    id: 'compat-chocv1',
+    category: 'compat',
+    label: 'Kailh Choc v1',
+    abbr: 'C1',
+    description: '薄型Choc v1専用。MXやChoc v2とは非互換のロープロ仕様。',
+  },
+  {
+    id: 'compat-chocv2',
+    category: 'compat',
+    label: 'Kailh Choc v2',
+    abbr: 'C2',
+    description: 'Choc v2専用キーキャップと互換。v1/MXとは非互換。',
+  },
 
   // 6. ポインティングデバイス (Pointing Device)
-  { id: 'pointing-tb', category: 'pointing', label: 'Trackball', abbr: 'TB' },
-  { id: 'pointing-tp', category: 'pointing', label: 'TrackPoint', abbr: 'TP' },
-  { id: 'pointing-td', category: 'pointing', label: 'Trackpad', abbr: 'TD' },
+  {
+    id: 'pointing-tb',
+    category: 'pointing',
+    label: 'Trackball',
+    abbr: 'TB',
+    description: '親指や指先でボールを回しホームポジションからカーソル操作。',
+  },
+  {
+    id: 'pointing-tp',
+    category: 'pointing',
+    label: 'TrackPoint',
+    abbr: 'TP',
+    description: 'キー間のスティックで小さな力でも精密にカーソル操作できる。',
+  },
+  {
+    id: 'pointing-td',
+    category: 'pointing',
+    label: 'Trackpad',
+    abbr: 'TD',
+    description: '指でなぞりカーソル移動やジェスチャー操作が可能。',
+  },
 
   // 7. ファームウェア (Firmware)
-  { id: 'firmware-qmk', category: 'firmware', label: 'QMK', abbr: 'QK' },
-  { id: 'firmware-zmk', category: 'firmware', label: 'ZMK', abbr: 'ZM' },
+  {
+    id: 'firmware-qmk',
+    category: 'firmware',
+    label: 'QMK',
+    abbr: 'QK',
+    description: '有線で広く使われる多機能OSSファームウェア。',
+  },
+  {
+    id: 'firmware-zmk',
+    category: 'firmware',
+    label: 'ZMK',
+    abbr: 'ZM',
+    description: '無線や省電力構成に適したモダンOSSファームウェア。',
+  },
 
   // 8. 拡張機能 (Features)
-  { id: 'feature-ec', category: 'features', label: 'Encoder', abbr: 'EC' },
-  { id: 'feature-dp', category: 'features', label: 'Display', abbr: 'DP' },
+  {
+    id: 'feature-ec',
+    category: 'features',
+    label: 'Encoder',
+    abbr: 'EC',
+    description: '回転ノブで音量/スクロール/レイヤー切替などに割り当て可能。',
+  },
+  {
+    id: 'feature-dp',
+    category: 'features',
+    label: 'Display',
+    abbr: 'DP',
+    description: 'OLED/電子ペーパー等でレイヤー・バッテリー・ロゴを表示。',
+  },
 ];
 
 const state = {
@@ -119,6 +269,15 @@ function renderPalette() {
         grid.appendChild(btn);
       });
     group.appendChild(grid);
+
+    const selected = state.selectedIcons.find((i) => i.category === cat);
+    const desc = document.createElement('div');
+    desc.className = 'group-desc';
+    desc.textContent = selected
+      ? `${selected.label} (${selected.abbr}) — ${selected.description || ''}`
+      : 'このカテゴリは未選択です。';
+    group.appendChild(desc);
+
     paletteBox.appendChild(group);
   });
 }
@@ -171,7 +330,8 @@ function renderSelected() {
   ordered.forEach((icon, index) => {
     const li = document.createElement('li');
     const info = document.createElement('div');
-    info.innerHTML = `<div class="label">${icon.label || 'Pitch'}</div><div class="meta">${icon.abbr} / ${icon.category}</div>`;
+    const desc = icon.description ? `<div class="desc">${icon.description}</div>` : '';
+    info.innerHTML = `<div class="label">${icon.label || 'Pitch'}</div><div class="meta">${icon.abbr} / ${icon.category}</div>${desc}`;
 
     const remove = document.createElement('button');
     remove.textContent = '削除';

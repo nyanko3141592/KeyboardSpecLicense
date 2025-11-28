@@ -215,6 +215,17 @@ button.ghost {
   text-transform: uppercase;
 }
 
+.group-desc {
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .pill-grid button {
   background: var(--pill);
   color: var(--pill-ink);
@@ -253,6 +264,12 @@ button.ghost {
   color: var(--muted);
   font-family: var(--mono);
   font-size: 13px;
+}
+
+.selected-list .desc {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .selected-list button {
