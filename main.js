@@ -331,7 +331,14 @@ function updatePaletteUI() {
 
   paletteButtons.forEach((btn) => {
     const icon = findIcon(btn.dataset.iconId);
-    if (icon) btn.textContent = `${icon.label} · ${icon.abbr}`;
+    if (icon) {
+      const buttonText = btn.querySelector('.button-text');
+      if (buttonText) {
+        buttonText.textContent = `${icon.label} · ${icon.abbr}`;
+      } else {
+        btn.textContent = `${icon.label} · ${icon.abbr}`;
+      }
+    }
     btn.classList.toggle('active', selectedIds.has(btn.dataset.iconId));
   });
 
@@ -851,8 +858,26 @@ function wireUI() {
   });
 }
 
+function loadIconPreviews() {
+  paletteButtons.forEach((btn) => {
+    const iconId = btn.dataset.iconId;
+    if (!iconId) return;
+
+    const iconPreview = btn.querySelector('.icon-preview');
+    if (!iconPreview) return;
+
+    const filename = iconFileMap[iconId] || `${iconId}.png`;
+    const iconUrl = iconDataUrlCache[filename] || `./public/${filename}`;
+
+    iconPreview.style.backgroundImage = `url(${iconUrl})`;
+  });
+}
+
 function init() {
-  preloadIcons().then(renderBadge);
+  preloadIcons().then(() => {
+    renderBadge();
+    loadIconPreviews();
+  });
   bootstrapDefaults();
   updatePaletteUI();
   renderSelected();

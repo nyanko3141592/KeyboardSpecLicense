@@ -612,6 +612,35 @@ button.ghost:hover {
   transform: scale(1.02) translateY(-1px);
 }
 
+.pill-grid button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+  padding: 10px 14px;
+}
+
+.pill-grid button .icon-preview {
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+  border-radius: var(--radius-xs);
+  background-color: var(--panel-secondary);
+  transition: all 250ms ease;
+}
+
+.pill-grid button.active .icon-preview {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.pill-grid button .button-text {
+  flex: 1;
+  text-align: left;
+}
+
 .selected-list {
   list-style: none;
   padding: 0;
