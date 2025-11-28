@@ -226,6 +226,10 @@ button.ghost {
   line-height: 1.5;
 }
 
+.group-desc div + div {
+  margin-top: 4px;
+}
+
 .pill-grid button {
   background: var(--pill);
   color: var(--pill-ink);

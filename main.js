@@ -105,11 +105,12 @@ const palette = [
     description: 'Bluetooth/2.4GHzなど完全無線。ケーブルレス運用。',
   },
   {
-    id: 'connect-hy',
+    id: 'connect-halfwired',
     category: 'connect',
-    label: 'Hybrid',
-    abbr: 'HY',
-    description: 'PCとは無線、左右ユニット間のみ有線などのハイブリッド。',
+    label: 'HalfWired',
+    abbr: 'HW',
+    description:
+      'PCとの通信は無線だが、それ以外の場所でケーブル接続が必要。主にBluetooth接続の分割キーボードで採用される構成。',
   },
 
   // 5. スイッチ・キーキャップ互換性 (Switch / Keycap Compatibility)
@@ -216,6 +217,7 @@ const categoryOrder = [
   'firmware',
   'features',
 ];
+const multiSelectCategories = new Set(['connect', 'compat', 'pointing', 'firmware', 'features']);
 
 function bootstrapDefaults() {
   const defaults = [
@@ -270,12 +272,16 @@ function renderPalette() {
       });
     group.appendChild(grid);
 
-    const selected = state.selectedIcons.find((i) => i.category === cat);
+    const selected = state.selectedIcons.filter((i) => i.category === cat);
     const desc = document.createElement('div');
     desc.className = 'group-desc';
-    desc.textContent = selected
-      ? `${selected.label} (${selected.abbr}) — ${selected.description || ''}`
-      : 'このカテゴリは未選択です。';
+    if (selected.length) {
+      desc.innerHTML = selected
+        .map((s) => `<div>${s.label} (${s.abbr}) — ${s.description || ''}</div>`)
+        .join('');
+    } else {
+      desc.textContent = 'このカテゴリは未選択です。';
+    }
     group.appendChild(desc);
 
     paletteBox.appendChild(group);
@@ -291,15 +297,20 @@ function toggleIcon(icon) {
   if (existingIndex >= 0) {
     state.selectedIcons.splice(existingIndex, 1);
   } else {
-    const sameCategoryIndex = state.selectedIcons.findIndex(
-      (i) => i.category === icon.category && i.category !== 'pitch'
-    );
-    if (sameCategoryIndex >= 0) {
-      state.selectedIcons.splice(sameCategoryIndex, 1, icon);
-    } else {
-      state.selectedIcons.push(icon);
+    const isMulti = multiSelectCategories.has(icon.category);
+    if (!isMulti && icon.category !== 'pitch') {
+      const sameCategoryIndex = state.selectedIcons.findIndex((i) => i.category === icon.category);
+      if (sameCategoryIndex >= 0) {
+        state.selectedIcons.splice(sameCategoryIndex, 1, icon);
+        return finalizeSelection();
+      }
     }
+    state.selectedIcons.push(icon);
   }
+  finalizeSelection();
+}
+
+function finalizeSelection() {
   if (!state.footerIsCustom) state.footerText = buildFooterText();
   renderPalette();
   renderSelected();
@@ -358,6 +369,21 @@ function getOrderedIcons() {
   );
 }
 
+function getVisualSlots() {
+  const slots = [];
+  categoryOrder.forEach((cat) => {
+    const items = state.selectedIcons.filter((i) => i.category === cat);
+    if (!items.length) return;
+    const allowMulti = multiSelectCategories.has(cat);
+    if (cat === 'pitch' || !allowMulti || items.length === 1) {
+      slots.push({ category: cat, items: [items[0]] });
+    } else {
+      slots.push({ category: cat, items });
+    }
+  });
+  return slots;
+}
+
 function setTheme(theme) {
   state.theme = theme;
   document.body.classList.toggle('dark', theme === 'dark');
@@ -368,12 +394,15 @@ function setTheme(theme) {
   renderBadge();
 }
 
+function formatAbbr(abbr) {
+  if (!abbr) return '';
+  return abbr.toString().toUpperCase().slice(0, 2);
+}
+
 function buildFooterText() {
-  const formatAbbr = (abbr) => {
-    if (!abbr) return '';
-    return abbr.toString().toUpperCase().slice(0, 2);
-  };
-  const pieces = getOrderedIcons().map((i) => formatAbbr(i.abbr));
+  const pieces = getVisualSlots().map((slot) =>
+    slot.items.map((i) => formatAbbr(i.abbr)).filter(Boolean).join('/')
+  );
   return pieces.filter(Boolean).join(' ');
 }
 
@@ -381,8 +410,17 @@ function syncFooterField() {
   footerField.value = state.footerText;
 }
 
+function describeWedge(cx, cy, r, startAngle, endAngle) {
+  const largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
+  const sx = cx + r * Math.cos(startAngle);
+  const sy = cy + r * Math.sin(startAngle);
+  const ex = cx + r * Math.cos(endAngle);
+  const ey = cy + r * Math.sin(endAngle);
+  return `M ${cx} ${cy} L ${sx} ${sy} A ${r} ${r} 0 ${largeArc} 1 ${ex} ${ey} Z`;
+}
+
 function renderBadge() {
-  const icons = getOrderedIcons();
+  const slots = getVisualSlots();
   const canvasHeight = 200;
   const bandHeight = 60;
   const bg = '#AAB2AB';
@@ -411,34 +449,66 @@ function renderBadge() {
   const attrStartX = leftOffset + mainEffective + 12 + attrOuterR;
   const attrRowY = topMargin + attrOuterR; // align tops of black strokes with topMargin
 
-  const contentWidth = icons.length
-    ? attrStartX + (icons.length - 1) * attrSpacing + attrOuterR + paddingRight
+  const contentWidth = slots.length
+    ? attrStartX + (slots.length - 1) * attrSpacing + attrOuterR + paddingRight
     : leftOffset + mainEffective + paddingRight;
   const width = Math.max(contentWidth, leftOffset + mainBgOuterRadius + paddingRight) + border;
 
-  const circles = icons
-    .map((icon, i) => {
+  const circles = slots
+    .map((slot, i) => {
       const cx = attrStartX + i * attrSpacing;
-      const clipId = `clip-${icon.id}-${i}`;
-      const href = `public/${icon.id}.png`;
       const innerR = attrRadius - 6;
+      const hrefBase = 'public/';
+      const isMulti = slot.items.length > 1;
+      const clipRoot = `clip-${slot.category}-${i}`;
+
+      const defs = isMulti
+        ? slot.items
+            .map((item, segIdx) => {
+              const segCount = slot.items.length;
+              const anglePer = (Math.PI * 2) / segCount;
+              const start = -Math.PI / 2 + anglePer * segIdx;
+              const end = start + anglePer;
+              const id = `${clipRoot}-${segIdx}`;
+              return `<clipPath id="${id}"><path d="${describeWedge(cx, attrRowY, innerR, start, end)}" /></clipPath>`;
+            })
+            .join('')
+        : `<clipPath id="${clipRoot}"><circle cx="${cx}" cy="${attrRowY}" r="${innerR}" /></clipPath>`;
+
+      const images = isMulti
+        ? slot.items
+            .map((item, segIdx) => {
+              const id = `${clipRoot}-${segIdx}`;
+              return `<image href="${hrefBase}${item.id}.png" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice" />`;
+            })
+            .join('')
+        : `<image href="${hrefBase}${slot.items[0].id}.png" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipRoot})" preserveAspectRatio="xMidYMid slice" />`;
+
+      const spokes = isMulti
+        ? slot.items
+            .map((_, segIdx) => {
+              const segCount = slot.items.length;
+              const anglePer = (Math.PI * 2) / segCount;
+              const angle = -Math.PI / 2 + anglePer * segIdx;
+              const x = cx + innerR * Math.cos(angle);
+              const y = attrRowY + innerR * Math.sin(angle);
+              return `<line x1="${cx}" y1="${attrRowY}" x2="${x}" y2="${y}" stroke="${ink}" stroke-width="1" />`;
+            })
+            .join('')
+        : '';
+
       return `
-        <g aria-label="${icon.label}">
-          <defs>
-            <clipPath id="${clipId}">
-              <circle cx="${cx}" cy="${attrRowY}" r="${innerR}" />
-            </clipPath>
-          </defs>
+        <g aria-label="${slot.items.map((s) => s.label).join(' / ')}">
+          <defs>${defs}</defs>
           <circle cx="${cx}" cy="${attrRowY}" r="${attrRadius}" fill="#ffffff" stroke="${ink}" stroke-width="${attrStroke}" />
-          <image href="${href}" x="${cx - innerR}" y="${attrRowY - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice" />
+          ${images}
+          ${spokes}
         </g>
       `;
     })
     .join('');
 
-  const footerPieces = [
-    ...icons.map((i) => (i.abbr || '').toString().toUpperCase().slice(0, 2)),
-  ];
+  const footerPieces = slots.map((slot) => slot.items.map((i) => formatAbbr(i.abbr)).filter(Boolean));
 
   const svgMarkup = `
     <rect width="${width}" height="${canvasHeight}" fill="${bg}" />
@@ -446,10 +516,16 @@ function renderBadge() {
       ${circles}
       <rect x="0" y="${canvasHeight - bandHeight}" width="${width}" height="${bandHeight}" fill="${band}" />
       ${footerPieces
-        .map((txt, idx) => {
+        .map((lines, idx) => {
+          if (!lines.length) return '';
           const cx = attrStartX + idx * attrSpacing;
-          const y = canvasHeight - bandHeight / 2;
-          return `<text x="${cx}" y="${y}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="34" font-weight="700" fill="${bandText}" dominant-baseline="middle">${txt}</text>`;
+          const centerY = canvasHeight - bandHeight / 2;
+          const lineHeight = 26;
+          const startY = centerY - ((lines.length - 1) * lineHeight) / 2;
+          const tspans = lines
+            .map((txt, lineIdx) => `<tspan x="${cx}" y="${startY + lineIdx * lineHeight}">${txt}</tspan>`)
+            .join('');
+          return `<text x="${cx}" y="${startY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="26" font-weight="700" fill="${bandText}">${tspans}</text>`;
         })
         .join('')}
       <circle cx="${mainCx}" cy="${mainCy}" r="${mainBgOuterRadius}" fill="${bg}" />
@@ -463,7 +539,7 @@ function renderBadge() {
   svg.setAttribute('viewBox', `0 0 ${width} ${canvasHeight}`);
   svg.setAttribute('width', width);
   svg.setAttribute('height', canvasHeight);
-  svg.innerHTML = svgMarkup;
+svg.innerHTML = svgMarkup;
 }
 
 function setMainLabel(value) {
