@@ -115,6 +115,15 @@ body {
     font-size: 11px;
   }
 
+  .help-toggle-fixed {
+    width: 40px;
+    height: 40px;
+  }
+
+  .help-toggle-fixed .help-icon {
+    font-size: 16px;
+  }
+
   .header-buttons {
     gap: 8px;
   }
@@ -224,6 +233,47 @@ body {
 
 .lang-toggle-fixed:hover .lang-text {
   transform: scale(1.05);
+}
+
+.help-toggle-fixed {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--panel);
+  border: 2px solid var(--line);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.help-toggle-fixed:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--accent);
+  background: var(--accent-ultra-light);
+}
+
+.help-toggle-fixed:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 100ms;
+}
+
+.help-toggle-fixed .help-icon {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.help-toggle-fixed:hover .help-icon {
+  color: var(--accent);
+  transform: scale(1.1);
 }
 
 .eyebrow {
