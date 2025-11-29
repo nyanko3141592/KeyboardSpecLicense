@@ -13,15 +13,19 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <button class="theme-toggle-fixed" id="theme-toggle-btn" aria-label="テーマ切り替え">
+    <button class="theme-toggle-fixed" id="theme-toggle-btn" aria-label="テーマ切り替え" data-i18n-aria="button.themeToggle">
       <span class="theme-icon">☀️</span>
+    </button>
+
+    <button class="lang-toggle-fixed" id="lang-toggle-btn" aria-label="言語切り替え">
+      <span class="lang-text">EN</span>
     </button>
 
     <header class="topbar">
       <div>
-        <p class="eyebrow">KeySpec Generator</p>
-        <h1>自作キーボードのスペックバッジを即生成</h1>
-        <p class="lede">
+        <p class="eyebrow" data-i18n="header.eyebrow">KeySpec Generator</p>
+        <h1 data-i18n="header.title">自作キーボードのスペックバッジを即生成</h1>
+        <p class="lede" data-i18n="header.lede">
           左のフォームを設定すると右のバッジがリアルタイムで更新されます。
         </p>
       </div>
@@ -30,134 +34,135 @@
     <main class="layout">
       <section class="panel controls" aria-label="設定フォーム">
         <div class="field">
-          <label for="main-label">キー数（メイン表示）</label>
+          <label for="main-label" data-i18n="main.label">キー数（メイン表示）</label>
           <input
             id="main-label"
             type="text"
             maxlength="4"
             placeholder="42"
             value="42"
+            data-i18n-placeholder="main.placeholder"
           />
-          <p class="hint">例: 42 / 60% / TKL（画像未指定ならここを表示）</p>
+          <p class="hint" data-i18n-hint="main.hint">例: 42 / 60% / TKL（画像未指定ならここを表示）</p>
           <div class="field">
             <label class="upload-button">
-              画像をアップロード
+              <span data-i18n="main.upload">画像をアップロード</span>
               <input id="main-image-file" type="file" accept="image/*" hidden />
             </label>
-            <button id="reset-main-image" class="ghost">画像をクリア</button>
-            <p class="hint">アップロードした画像を中央円に表示。未設定ならキー数テキスト。</p>
+            <button id="reset-main-image" class="ghost" data-i18n="main.reset">画像をクリア</button>
+            <p class="hint" data-i18n-hint="main.imageHint">アップロードした画像を中央円に表示。未設定ならキー数テキスト。</p>
           </div>
         </div>
 
         <div class="field">
-          <label for="pitch-input">キーピッチ</label>
+          <label for="pitch-input" data-i18n="pitch.label">キーピッチ</label>
           <div class="pitch-set">
             <input id="pitch-input" type="text" value="19mm" />
-            <button id="set-pitch">セット</button>
+            <button id="set-pitch" data-i18n="pitch.set">セット</button>
           </div>
           <div class="pitch-set sub">
             <input id="pitch-abbr" type="text" value="KP" maxlength="6" />
-            <span class="hint">帯テキスト（デフォルト KP / 任意文字可）</span>
+            <span class="hint" data-i18n-hint="pitch.abbr">帯テキスト（デフォルト KP / 任意文字可）</span>
           </div>
-          <p class="hint">ピッチは自由入力。下帯は任意テキストを設定可。</p>
+          <p class="hint" data-i18n-hint="pitch.hint">ピッチは自由入力。下帯は任意テキストを設定可。</p>
         </div>
 
         <div class="field">
-          <label>属性アイコン（カテゴリ別・固定並び）</label>
+          <label data-i18n="palette.label">属性アイコン（カテゴリ別・固定並び）</label>
           <div id="palette" class="palette-stack">
             <div class="palette-group" data-category-group="shape">
-              <h3>形状 (Shape)</h3>
+              <h3 data-i18n="category.shape">形状 (Shape)</h3>
               <div class="pill-grid">
                 <button type="button" data-icon-id="shape-split" data-category="shape" data-label="Split" data-abbr="SP" data-description="左右ユニットが分離し肩幅に合わせられるため、手首負担を減らしやすい。"><span class="icon-preview"></span><span class="button-text">Split · SP</span></button>
                 <button type="button" data-icon-id="shape-unibody" data-category="shape" data-label="Unibody" data-abbr="UB" data-description="一枚板の筐体で取り回しが良く、剛性や打鍵音を安定させやすい。"><span class="icon-preview"></span><span class="button-text">Unibody · UB</span></button>
                 <button type="button" data-icon-id="shape-macropad" data-category="shape" data-label="MacroPad" data-abbr="MP" data-description="テンキー/ファンクションなど補助用途に特化した小型キーボード。"><span class="icon-preview"></span><span class="button-text">MacroPad · MP</span></button>
-                <button type="button" class="ghost" data-custom-category="shape">カスタム画像</button>
+                <button type="button" class="ghost" data-custom-category="shape" data-i18n="palette.custom">カスタム画像</button>
               </div>
-              <div class="group-desc" data-desc-for="shape">このカテゴリは未選択です。</div>
+              <div class="group-desc" data-desc-for="shape" data-i18n="palette.unselected">このカテゴリは未選択です。</div>
             </div>
 
             <div class="palette-group" data-category-group="layout">
-              <h3>配列 (Layout)</h3>
+              <h3 data-i18n="category.layout">配列 (Layout)</h3>
               <div class="pill-grid">
                 <button type="button" data-icon-id="stagger-row" data-category="layout" data-label="Row-staggered" data-abbr="RS" data-description="横方向に段差をつけた一般的配列。通常キーボードから移行しやすい。"><span class="icon-preview"></span><span class="button-text">Row-staggered · RS</span></button>
                 <button type="button" data-icon-id="stagger-column" data-category="layout" data-label="Column-staggered" data-abbr="CS" data-description="縦方向に段差をつけ指の長さに合わせた配列で、移動量を減らしやすい。"><span class="icon-preview"></span><span class="button-text">Column-staggered · CS</span></button>
                 <button type="button" data-icon-id="layout-or" data-category="layout" data-label="Ortholinear" data-abbr="OR" data-description="キーが格子状に縦横まっすぐ並ぶ配列。"><span class="icon-preview"></span><span class="button-text">Ortholinear · OR</span></button>
                 <button type="button" data-icon-id="layout-alice" data-category="layout" data-label="Alice / Arisu" data-abbr="AL" data-description="一体型で中央が開いたハの字配列。自然な手首角度を取りやすい。"><span class="icon-preview"></span><span class="button-text">Alice / Arisu · AL</span></button>
                 <button type="button" data-icon-id="layout-grin" data-category="layout" data-label="GRIN" data-abbr="GR" data-description="エルゴ性を重視した独自特殊配列。"><span class="icon-preview"></span><span class="button-text">GRIN · GR</span></button>
-                <button type="button" class="ghost" data-custom-category="layout">カスタム画像</button>
+                <button type="button" class="ghost" data-custom-category="layout" data-i18n="palette.custom">カスタム画像</button>
               </div>
-              <div class="group-desc" data-desc-for="layout">このカテゴリは未選択です。</div>
+              <div class="group-desc" data-desc-for="layout" data-i18n="palette.unselected">このカテゴリは未選択です。</div>
             </div>
 
             <div class="palette-group" data-category-group="connect">
-              <h3>接続 (Connect)</h3>
+              <h3 data-i18n="category.connect">接続 (Connect)</h3>
               <div class="pill-grid">
                 <button type="button" data-icon-id="connect-wr" data-category="connect" data-label="Wired" data-abbr="WR" data-description="USBなど有線で接続し、電源・通信が安定。"><span class="icon-preview"></span><span class="button-text">Wired · WR</span></button>
                 <button type="button" data-icon-id="connect-wl" data-category="connect" data-label="Wireless" data-abbr="WL" data-description="Bluetooth/2.4GHzなど完全無線。ケーブルレス運用。"><span class="icon-preview"></span><span class="button-text">Wireless · WL</span></button>
                 <button type="button" data-icon-id="connect-halfwired" data-category="connect" data-label="HalfWired" data-abbr="HW" data-description="PCとの通信は無線だが、それ以外の場所でケーブル接続が必要。主にBluetooth接続の分割キーボードで採用される構成。"><span class="icon-preview"></span><span class="button-text">HalfWired · HW</span></button>
-                <button type="button" class="ghost" data-custom-category="connect">カスタム画像</button>
+                <button type="button" class="ghost" data-custom-category="connect" data-i18n="palette.custom">カスタム画像</button>
               </div>
-              <div class="group-desc" data-desc-for="connect">このカテゴリは未選択です。</div>
+              <div class="group-desc" data-desc-for="connect" data-i18n="palette.unselected">このカテゴリは未選択です。</div>
             </div>
 
             <div class="palette-group" data-category-group="compat">
-              <h3>互換性 (Switch / Keycap)</h3>
+              <h3 data-i18n="category.compat">互換性 (Switch / Keycap)</h3>
               <div class="pill-grid">
                 <button type="button" data-icon-id="compat-mx" data-category="compat" data-label="Cherry MX" data-abbr="MX" data-description="十字軸。一般的なMX規格キーキャップと互換性がある。"><span class="icon-preview"></span><span class="button-text">Cherry MX · MX</span></button>
                 <button type="button" data-icon-id="compat-chocv1" data-category="compat" data-label="Kailh Choc v1" data-abbr="C1" data-description="薄型Choc v1専用。MXやChoc v2とは非互換のロープロ仕様。"><span class="icon-preview"></span><span class="button-text">Kailh Choc v1 · C1</span></button>
                 <button type="button" data-icon-id="compat-chocv2" data-category="compat" data-label="Kailh Choc v2" data-abbr="C2" data-description="Choc v2専用キーキャップと互換。v1/MXとは非互換。"><span class="icon-preview"></span><span class="button-text">Kailh Choc v2 · C2</span></button>
-                <button type="button" class="ghost" data-custom-category="compat">カスタム画像</button>
+                <button type="button" class="ghost" data-custom-category="compat" data-i18n="palette.custom">カスタム画像</button>
               </div>
-              <div class="group-desc" data-desc-for="compat">このカテゴリは未選択です。</div>
+              <div class="group-desc" data-desc-for="compat" data-i18n="palette.unselected">このカテゴリは未選択です。</div>
             </div>
 
             <div class="palette-group" data-category-group="pointing">
-              <h3>ポインティング (Pointing)</h3>
+              <h3 data-i18n="category.pointing">ポインティング (Pointing)</h3>
               <div class="pill-grid">
                 <button type="button" data-icon-id="pointing-tb" data-category="pointing" data-label="Trackball" data-abbr="TB" data-description="親指や指先でボールを回しホームポジションからカーソル操作。"><span class="icon-preview"></span><span class="button-text">Trackball · TB</span></button>
                 <button type="button" data-icon-id="pointing-tp" data-category="pointing" data-label="TrackPoint" data-abbr="TP" data-description="キー間のスティックで小さな力でも精密にカーソル操作できる。"><span class="icon-preview"></span><span class="button-text">TrackPoint · TP</span></button>
                 <button type="button" data-icon-id="pointing-td" data-category="pointing" data-label="Trackpad" data-abbr="TD" data-description="指でなぞりカーソル移動やジェスチャー操作が可能。"><span class="icon-preview"></span><span class="button-text">Trackpad · TD</span></button>
-                <button type="button" class="ghost" data-custom-category="pointing">カスタム画像</button>
+                <button type="button" class="ghost" data-custom-category="pointing" data-i18n="palette.custom">カスタム画像</button>
               </div>
-              <div class="group-desc" data-desc-for="pointing">このカテゴリは未選択です。</div>
+              <div class="group-desc" data-desc-for="pointing" data-i18n="palette.unselected">このカテゴリは未選択です。</div>
             </div>
 
             <div class="palette-group" data-category-group="firmware">
-              <h3>ファームウェア (Firmware)</h3>
+              <h3 data-i18n="category.firmware">ファームウェア (Firmware)</h3>
               <div class="pill-grid">
                 <button type="button" data-icon-id="firmware-qmk" data-category="firmware" data-label="QMK" data-abbr="FW" data-description="有線で広く使われる多機能OSSファームウェア。"><span class="icon-preview"></span><span class="button-text">QMK · FW</span></button>
                 <button type="button" data-icon-id="firmware-zmk" data-category="firmware" data-label="ZMK" data-abbr="FW" data-description="無線や省電力構成に適したモダンOSSファームウェア。"><span class="icon-preview"></span><span class="button-text">ZMK · FW</span></button>
                 <button type="button" data-icon-id="firmware-via" data-category="firmware" data-label="VIA" data-abbr="FW" data-description="GUIでキーマップ編集ができる設定ツール。対応ファームで動作。"><span class="icon-preview"></span><span class="button-text">VIA · FW</span></button>
                 <button type="button" data-icon-id="firmware-vial" data-category="firmware" data-label="VIAL" data-abbr="FW" data-description="VIA互換の上位版。より多機能でセキュアなキーマップ管理が可能。"><span class="icon-preview"></span><span class="button-text">VIAL · FW</span></button>
-                <button type="button" class="ghost" data-custom-category="firmware">カスタム画像</button>
+                <button type="button" class="ghost" data-custom-category="firmware" data-i18n="palette.custom">カスタム画像</button>
               </div>
-              <div class="group-desc" data-desc-for="firmware">このカテゴリは未選択です。</div>
+              <div class="group-desc" data-desc-for="firmware" data-i18n="palette.unselected">このカテゴリは未選択です。</div>
             </div>
 
             <div class="palette-group" data-category-group="features">
-              <h3>拡張機能 (Features)</h3>
+              <h3 data-i18n="category.features">拡張機能 (Features)</h3>
               <div class="pill-grid">
                 <button type="button" data-icon-id="feature-ec" data-category="features" data-label="Encoder" data-abbr="EC" data-description="回転ノブで音量/スクロール/レイヤー切替などに割り当て可能。"><span class="icon-preview"></span><span class="button-text">Encoder · EC</span></button>
                 <button type="button" data-icon-id="feature-dp" data-category="features" data-label="Display" data-abbr="DP" data-description="OLED/電子ペーパー等でレイヤー・バッテリー・ロゴを表示。"><span class="icon-preview"></span><span class="button-text">Display · DP</span></button>
-                <button type="button" class="ghost" data-custom-category="features">カスタム画像</button>
+                <button type="button" class="ghost" data-custom-category="features" data-i18n="palette.custom">カスタム画像</button>
               </div>
-              <div class="group-desc" data-desc-for="features">このカテゴリは未選択です。</div>
+              <div class="group-desc" data-desc-for="features" data-i18n="palette.unselected">このカテゴリは未選択です。</div>
             </div>
           </div>
-          <p class="hint">カテゴリごとに1つを選択（ピッチは右で入力）。並び順は固定。</p>
+          <p class="hint" data-i18n-hint="palette.hint">カテゴリごとに1つを選択（ピッチは右で入力）。並び順は固定。</p>
         </div>
 
         <div class="field">
-          <label>選択済みアイコン</label>
+          <label data-i18n="selected.label">選択済みアイコン</label>
           <ul id="selected-list" class="selected-list"></ul>
         </div>
 
         <div class="field">
-          <label for="footer-text">下部帯テキスト</label>
+          <label for="footer-text" data-i18n="footer.label">下部帯テキスト</label>
           <textarea id="footer-text" rows="2"></textarea>
           <div class="row gap-sm">
-            <button id="reset-footer" class="ghost">自動生成に戻す</button>
-            <span class="hint">自動: メイン + 略称を " - " で連結</span>
+            <button id="reset-footer" class="ghost" data-i18n="footer.reset">自動生成に戻す</button>
+            <span class="hint" data-i18n-hint="footer.hint">自動: メイン + 略称を " - " で連結</span>
           </div>
         </div>
       </section>
@@ -165,7 +170,7 @@
       <section class="panel preview" aria-label="プレビュー">
         <div class="preview-canvas" id="preview-area">
           <svg id="badge-svg" role="img" aria-label="KeySpec badge"></svg>
-          <button id="download-image" class="floating-download" aria-label="画像を保存">保存</button>
+          <button id="download-image" class="floating-download" aria-label="画像を保存" data-i18n="button.download" data-i18n-aria="button.download">保存</button>
         </div>
       </section>
     </main>

@@ -102,6 +102,22 @@ body {
   body {
     padding: 12px;
   }
+
+  .theme-toggle-fixed {
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .lang-toggle-fixed {
+    top: 16px;
+    right: 64px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
 }
 
 .topbar {
@@ -154,6 +170,52 @@ body {
 
 .theme-toggle-fixed:hover .theme-icon {
   transform: rotate(25deg) scale(1.1);
+}
+
+.lang-toggle-fixed {
+  position: fixed;
+  top: 24px;
+  right: 84px;
+  z-index: 1000;
+  min-width: 48px;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: var(--radius-full);
+  background: var(--panel);
+  border: 2px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(12px);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.lang-toggle-fixed:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--accent);
+  background: var(--accent-ultra-light);
+  color: var(--accent);
+}
+
+.lang-toggle-fixed:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 100ms;
+}
+
+.lang-text {
+  line-height: 1;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lang-toggle-fixed:hover .lang-text {
+  transform: scale(1.05);
 }
 
 .eyebrow {

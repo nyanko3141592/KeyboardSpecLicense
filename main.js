@@ -1,6 +1,9 @@
+import { initI18n, getCurrentLanguage, t } from './i18n.js';
+
 const state = {
   mainLabel: '42',
   theme: 'light',
+  language: getCurrentLanguage(),
   pitchValue: '19mm',
   pitchAbbr: 'KP',
   mainImageUrl: '',
@@ -18,21 +21,24 @@ const palette = [
     category: 'shape',
     label: 'Split',
     abbr: 'SP',
-    description: '左右ユニットが分離し肩幅に合わせられるため、手首負担を減らしやすい。',
+    description_ja: '左右ユニットが分離し肩幅に合わせられるため、手首負担を減らしやすい。',
+    description_en: 'Left and right units are separated, allowing adjustment to shoulder width to reduce wrist strain.',
   },
   {
     id: 'shape-unibody',
     category: 'shape',
     label: 'Unibody',
     abbr: 'UB',
-    description: '一枚板の筐体で取り回しが良く、剛性や打鍵音を安定させやすい。',
+    description_ja: '一枚板の筐体で取り回しが良く、剛性や打鍵音を安定させやすい。',
+    description_en: 'Single-piece case for easy handling, stable rigidity and typing sound.',
   },
   {
     id: 'shape-macropad',
     category: 'shape',
     label: 'MacroPad',
     abbr: 'MP',
-    description: 'テンキー/ファンクションなど補助用途に特化した小型キーボード。',
+    description_ja: 'テンキー/ファンクションなど補助用途に特化した小型キーボード。',
+    description_en: 'Small keyboard specialized for auxiliary purposes like numpad/function keys.',
   },
 
   // 2. スタッガード (Stagger)
@@ -41,14 +47,16 @@ const palette = [
     category: 'layout',
     label: 'Row-staggered',
     abbr: 'RS',
-    description: '横方向に段差をつけた一般的配列。通常キーボードから移行しやすい。',
+    description_ja: '横方向に段差をつけた一般的配列。通常キーボードから移行しやすい。',
+    description_en: 'Common layout with horizontal offset. Easy transition from standard keyboards.',
   },
   {
     id: 'stagger-column',
     category: 'layout',
     label: 'Column-staggered',
     abbr: 'CS',
-    description: '縦方向に段差をつけ指の長さに合わせた配列で、移動量を減らしやすい。',
+    description_ja: '縦方向に段差をつけ指の長さに合わせた配列で、移動量を減らしやすい。',
+    description_en: 'Vertical offset matching finger lengths, reducing finger travel distance.',
   },
 
   // 3. 配列 (Layout)
@@ -57,21 +65,24 @@ const palette = [
     category: 'layout',
     label: 'Ortholinear',
     abbr: 'OR',
-    description: 'キーが格子状に縦横まっすぐ並ぶ配列。',
+    description_ja: 'キーが格子状に縦横まっすぐ並ぶ配列。',
+    description_en: 'Keys arranged in a straight grid pattern both vertically and horizontally.',
   },
   {
     id: 'layout-alice',
     category: 'layout',
     label: 'Alice / Arisu',
     abbr: 'AL',
-    description: '一体型で中央が開いたハの字配列。自然な手首角度を取りやすい。',
+    description_ja: '一体型で中央が開いたハの字配列。自然な手首角度を取りやすい。',
+    description_en: 'Unified layout with open center in V-shape. Easier to maintain natural wrist angle.',
   },
   {
     id: 'layout-grin',
     category: 'layout',
     label: 'GRIN',
     abbr: 'GR',
-    description: 'エルゴ性を重視した独自特殊配列。',
+    description_ja: 'エルゴ性を重視した独自特殊配列。',
+    description_en: 'Unique special layout focusing on ergonomics.',
   },
 
   // 4. 接続 (Connect)
@@ -80,22 +91,24 @@ const palette = [
     category: 'connect',
     label: 'Wired',
     abbr: 'WR',
-    description: 'USBなど有線で接続し、電源・通信が安定。',
+    description_ja: 'USBなど有線で接続し、電源・通信が安定。',
+    description_en: 'Wired connection via USB etc., providing stable power and communication.',
   },
   {
     id: 'connect-wl',
     category: 'connect',
     label: 'Wireless',
     abbr: 'WL',
-    description: 'Bluetooth/2.4GHzなど完全無線。ケーブルレス運用。',
+    description_ja: 'Bluetooth/2.4GHzなど完全無線。ケーブルレス運用。',
+    description_en: 'Fully wireless via Bluetooth/2.4GHz. Cable-free operation.',
   },
   {
     id: 'connect-halfwired',
     category: 'connect',
     label: 'HalfWired',
     abbr: 'HW',
-    description:
-      'PCとの通信は無線だが、それ以外の場所でケーブル接続が必要。主にBluetooth接続の分割キーボードで採用される構成。',
+    description_ja: 'PCとの通信は無線だが、それ以外の場所でケーブル接続が必要。主にBluetooth接続の分割キーボードで採用される構成。',
+    description_en: 'Wireless connection to PC, but requires cable elsewhere. Commonly used in Bluetooth split keyboards.',
   },
 
   // 5. スイッチ・キーキャップ互換性 (Switch / Keycap Compatibility)
@@ -104,21 +117,24 @@ const palette = [
     category: 'compat',
     label: 'Cherry MX',
     abbr: 'MX',
-    description: '十字軸。一般的なMX規格キーキャップと互換性がある。',
+    description_ja: '十字軸。一般的なMX規格キーキャップと互換性がある。',
+    description_en: 'Cross-stem. Compatible with standard MX keycaps.',
   },
   {
     id: 'compat-chocv1',
     category: 'compat',
     label: 'Kailh Choc v1',
     abbr: 'C1',
-    description: '薄型Choc v1専用。MXやChoc v2とは非互換のロープロ仕様。',
+    description_ja: '薄型Choc v1専用。MXやChoc v2とは非互換のロープロ仕様。',
+    description_en: 'Low-profile Choc v1 exclusive. Incompatible with MX and Choc v2.',
   },
   {
     id: 'compat-chocv2',
     category: 'compat',
     label: 'Kailh Choc v2',
     abbr: 'C2',
-    description: 'Choc v2専用キーキャップと互換。v1/MXとは非互換。',
+    description_ja: 'Choc v2専用キーキャップと互換。v1/MXとは非互換。',
+    description_en: 'Compatible with Choc v2 keycaps. Incompatible with v1/MX.',
   },
 
   // 6. ポインティングデバイス (Pointing Device)
@@ -127,21 +143,24 @@ const palette = [
     category: 'pointing',
     label: 'Trackball',
     abbr: 'TB',
-    description: '親指や指先でボールを回しホームポジションからカーソル操作。',
+    description_ja: '親指や指先でボールを回しホームポジションからカーソル操作。',
+    description_en: 'Roll ball with thumb or fingertip for cursor control from home position.',
   },
   {
     id: 'pointing-tp',
     category: 'pointing',
     label: 'TrackPoint',
     abbr: 'TP',
-    description: 'キー間のスティックで小さな力でも精密にカーソル操作できる。',
+    description_ja: 'キー間のスティックで小さな力でも精密にカーソル操作できる。',
+    description_en: 'Stick between keys allows precise cursor control with minimal force.',
   },
   {
     id: 'pointing-td',
     category: 'pointing',
     label: 'Trackpad',
     abbr: 'TD',
-    description: '指でなぞりカーソル移動やジェスチャー操作が可能。',
+    description_ja: '指でなぞりカーソル移動やジェスチャー操作が可能。',
+    description_en: 'Swipe finger for cursor movement and gesture operations.',
   },
 
   // 7. ファームウェア (Firmware)
@@ -150,28 +169,32 @@ const palette = [
     category: 'firmware',
     label: 'QMK',
     abbr: 'FW',
-    description: '有線で広く使われる多機能OSSファームウェア。',
+    description_ja: '有線で広く使われる多機能OSSファームウェア。',
+    description_en: 'Feature-rich OSS firmware widely used for wired keyboards.',
   },
   {
     id: 'firmware-zmk',
     category: 'firmware',
     label: 'ZMK',
     abbr: 'FW',
-    description: '無線や省電力構成に適したモダンOSSファームウェア。',
+    description_ja: '無線や省電力構成に適したモダンOSSファームウェア。',
+    description_en: 'Modern OSS firmware suitable for wireless and low-power configurations.',
   },
   {
     id: 'firmware-via',
     category: 'firmware',
     label: 'VIA',
     abbr: 'FW',
-    description: 'GUIでキーマップ編集ができる設定ツール。対応ファームで動作。',
+    description_ja: 'GUIでキーマップ編集ができる設定ツール。対応ファームで動作。',
+    description_en: 'GUI-based keymap editing tool. Works with compatible firmware.',
   },
   {
     id: 'firmware-vial',
     category: 'firmware',
     label: 'VIAL',
     abbr: 'FW',
-    description: 'VIA互換の上位版。より多機能でセキュアなキーマップ管理が可能。',
+    description_ja: 'VIA互換の上位版。より多機能でセキュアなキーマップ管理が可能。',
+    description_en: 'VIA-compatible advanced version. More features and secure keymap management.',
   },
 
   // 8. 拡張機能 (Features)
@@ -180,14 +203,16 @@ const palette = [
     category: 'features',
     label: 'Encoder',
     abbr: 'EC',
-    description: '回転ノブで音量/スクロール/レイヤー切替などに割り当て可能。',
+    description_ja: '回転ノブで音量/スクロール/レイヤー切替などに割り当て可能。',
+    description_en: 'Rotary knob assignable to volume/scroll/layer switching etc.',
   },
   {
     id: 'feature-dp',
     category: 'features',
     label: 'Display',
     abbr: 'DP',
-    description: 'OLED/電子ペーパー等でレイヤー・バッテリー・ロゴを表示。',
+    description_ja: 'OLED/電子ペーパー等でレイヤー・バッテリー・ロゴを表示。',
+    description_en: 'Display layer/battery/logo on OLED/e-paper etc.',
   },
 ];
 
@@ -288,13 +313,16 @@ function startCustomIcon(category) {
 }
 
 function finishCustomIcon(category, src) {
-  const abbr = prompt('帯に入れる略称（2-4文字推奨）', 'CU') || 'CU';
+  const lang = state.language || getCurrentLanguage();
+  const promptText = lang === 'ja' ? '帯に入れる略称（2-4文字推奨）' : 'Abbreviation for badge (2-4 chars recommended)';
+  const abbr = prompt(promptText, 'CU') || 'CU';
   const icon = {
     id: `custom-${category}`,
     category,
     label: 'Custom',
     abbr,
-    description: 'ユーザー指定アイコン',
+    description_ja: 'ユーザー指定アイコン',
+    description_en: 'User-specified icon',
   };
   state.customIconMap[icon.id] = src;
   const isMulti = multiSelectCategories.has(category);
@@ -352,11 +380,15 @@ function updatePaletteUI() {
     const cat = descEl.dataset.descFor;
     const selected = state.selectedIcons.filter((i) => i.category === cat);
     if (selected.length) {
+      const lang = state.language || getCurrentLanguage();
       descEl.innerHTML = selected
-        .map((s) => `<div>${s.label} (${s.abbr}) — ${s.description || ''}</div>`)
+        .map((s) => {
+          const desc = lang === 'ja' ? s.description_ja : s.description_en;
+          return `<div>${s.label} (${s.abbr}) — ${desc || ''}</div>`;
+        })
         .join('');
     } else {
-      descEl.textContent = 'このカテゴリは未選択です。';
+      descEl.textContent = t('palette.unselected');
     }
   });
 }
@@ -477,6 +509,9 @@ function renderIconOrText(item, cx, cy, innerR, clipId) {
 function setTheme(theme) {
   state.theme = theme;
   document.body.classList.toggle('dark', theme === 'dark');
+
+  // localStorageに保存
+  localStorage.setItem('theme', theme);
 
   // Update fixed toggle button
   const toggleBtn = document.getElementById('theme-toggle-btn');
@@ -874,6 +909,24 @@ function loadIconPreviews() {
 }
 
 function init() {
+  // localStorageからテーマを復元
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark' || savedTheme === 'light') {
+    state.theme = savedTheme;
+  }
+  // テーマを適用（UIの更新も行う）
+  setTheme(state.theme);
+
+  // 国際化を初期化
+  initI18n();
+
+  // 言語変更イベントをリスニング
+  window.addEventListener('languagechange', (e) => {
+    state.language = e.detail.lang;
+    updatePaletteUI();
+    renderSelected();
+  });
+
   preloadIcons().then(() => {
     renderBadge();
     loadIconPreviews();
