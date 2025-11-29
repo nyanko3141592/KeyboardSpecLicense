@@ -50,6 +50,15 @@
   <main class="layout">
     <section class="panel controls" aria-label="設定フォーム">
       <div class="field">
+        <label data-i18n="rowCount.label">行数</label>
+        <div class="row-count-buttons">
+          <button type="button" id="row-count-1" class="row-count-btn active" data-rows="1">1行</button>
+          <button type="button" id="row-count-2" class="row-count-btn" data-rows="2">2行</button>
+        </div>
+        <p class="hint" data-i18n-hint="rowCount.hint">2行にするとアイコンを上下2段に分けて表示します。</p>
+      </div>
+
+      <div class="field">
         <label for="main-label" data-i18n="main.label">キー数（メイン表示）</label>
         <input id="main-label" type="text" maxlength="4" placeholder="42" value="42"
           data-i18n-placeholder="main.placeholder" />

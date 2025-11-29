@@ -16,6 +16,7 @@ const state = {
   batteryText: 'AAA',
   freeformIcons: [], // { id, type: 'image'|'text', data, abbr }
   freeformIdCounter: 0,
+  rowCount: 1, // 1 or 2 rows for icon layout
 };
 
 const paletteButtons = Array.from(document.querySelectorAll('button[data-icon-id]'));
@@ -986,6 +987,11 @@ function saveStateToURL() {
     params.set('batteryText', state.batteryText);
   }
 
+  // 行数
+  if (state.rowCount && state.rowCount !== 1) {
+    params.set('rows', state.rowCount.toString());
+  }
+
   // URLを更新（リロードなし）
   const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
   window.history.replaceState({}, '', newUrl);
@@ -1071,6 +1077,18 @@ function loadStateFromURL() {
     }
   }
 
+  // 行数
+  const rows = params.get('rows');
+  if (rows) {
+    const rowCount = parseInt(rows, 10);
+    if (rowCount === 1 || rowCount === 2) {
+      state.rowCount = rowCount;
+      document.querySelectorAll('.row-count-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.rows, 10) === rowCount);
+      });
+    }
+  }
+
   return params.toString().length > 0;
 }
 
@@ -1119,8 +1137,6 @@ function describeWedge(cx, cy, r, startAngle, endAngle) {
 
 function renderBadge() {
   const slots = getVisualSlots();
-  const canvasHeight = 200;
-  const bandHeight = 60;
   const bg = '#AAB2AB';
   const ink = '#000000';
   const band = '#000000';
@@ -1136,8 +1152,6 @@ function renderBadge() {
   const mainRingBg = 15;
   const mainBlackOuterRadius = mainWhiteRadius + mainRingBlack; // outer edge of black ring
   const mainBgOuterRadius = mainBlackOuterRadius + mainRingBg; // outer edge of bg ring
-  const mainCx = leftOffset + mainBlackOuterRadius;
-  const mainCy = topMargin + mainBlackOuterRadius; // black ring top = topMargin
   const mainEffective = mainBgOuterRadius * 2;
 
   const attrRadius = 45; // white core radius => 90px diameter
@@ -1145,144 +1159,198 @@ function renderBadge() {
   const attrOuterR = attrRadius + attrStroke / 2;
   const attrSpacing = attrOuterR * 2 + 8; // reduced gap
   const attrStartX = leftOffset + mainEffective + 12 + attrOuterR;
-  const attrRowY = topMargin + attrOuterR; // align tops of black strokes with topMargin
 
-  const contentWidth = slots.length
-    ? attrStartX + (slots.length - 1) * attrSpacing + attrOuterR + paddingRight
+  // 2行レイアウト対応
+  const rowCount = state.rowCount || 1;
+  const singleBandHeight = 40; // 各帯の高さ
+  const iconRowHeight = attrOuterR * 2 + 10; // アイコン行の高さ（上下マージン含む）
+
+  // 2行モード: アイコン行1 + 帯1 + アイコン行2 + 帯2
+  // 1行モード: アイコン行 + 帯
+  const bandHeight = rowCount === 2 ? singleBandHeight : 60;
+  const canvasHeight = rowCount === 2
+    ? topMargin + iconRowHeight + singleBandHeight + iconRowHeight + singleBandHeight
+    : 200;
+
+  // 各行のY座標（アイコン中心）
+  const attrRow1Y = topMargin + attrOuterR;
+  const band1Y = topMargin + iconRowHeight; // 1行目の帯のY位置
+  const attrRow2Y = band1Y + singleBandHeight + attrOuterR + 5; // 2行目のアイコン中心
+  const band2Y = canvasHeight - singleBandHeight; // 2行目の帯のY位置（最下部）
+
+  // メインアイコンの位置（常に同じ位置 - 左上固定）
+  const mainCx = leftOffset + mainBlackOuterRadius;
+  const mainCy = topMargin + mainBlackOuterRadius;
+
+  // 2行時はスロットを上段と下段に分割
+  let row1Slots = slots;
+  let row2Slots = [];
+
+  if (rowCount === 2 && slots.length > 1) {
+    const halfIdx = Math.ceil(slots.length / 2);
+    row1Slots = slots.slice(0, halfIdx);
+    row2Slots = slots.slice(halfIdx);
+  }
+
+  // 幅の計算（長い方の行に合わせる）
+  const maxSlotsPerRow = Math.max(row1Slots.length, row2Slots.length);
+  const contentWidth = maxSlotsPerRow
+    ? attrStartX + (maxSlotsPerRow - 1) * attrSpacing + attrOuterR + paddingRight
     : leftOffset + mainEffective + paddingRight;
   const width = Math.max(contentWidth, leftOffset + mainBgOuterRadius + paddingRight) + border;
 
-  const circles = slots
-    .map((slot, i) => {
-      const itemsSorted = slot.items.length > 1
-        ? [...slot.items].sort((a, b) => {
-            const ai = iconOrder[a.id] ?? 9999;
-            const bi = iconOrder[b.id] ?? 9999;
-            if (ai !== bi) return ai - bi;
-            return a.label.localeCompare(b.label);
-          })
-        : slot.items;
+  // スロットをレンダリングする関数
+  function renderSlot(slot, slotIdx, rowY, rowPrefix) {
+    const itemsSorted = slot.items.length > 1
+      ? [...slot.items].sort((a, b) => {
+          const ai = iconOrder[a.id] ?? 9999;
+          const bi = iconOrder[b.id] ?? 9999;
+          if (ai !== bi) return ai - bi;
+          return a.label.localeCompare(b.label);
+        })
+      : slot.items;
 
-      const cx = attrStartX + i * attrSpacing;
-      const innerR = attrRadius - 6;
-      const isMulti = itemsSorted.length > 1;
-      const clipRoot = `clip-${slot.category}-${i}`;
+    const cx = attrStartX + slotIdx * attrSpacing;
+    const innerR = attrRadius - 6;
+    const isMulti = itemsSorted.length > 1;
+    const clipRoot = `clip-${rowPrefix}-${slot.category}-${slotIdx}`;
 
-      const defs = isMulti
+    const defs = isMulti
+      ? itemsSorted
+        .map((_, segIdx) => {
+          const segCount = itemsSorted.length;
+          const anglePer = (Math.PI * 2) / segCount;
+          const start = -Math.PI / 2 + anglePer * segIdx;
+          const end = start + anglePer;
+          const id = `${clipRoot}-${segIdx}`;
+          return `<clipPath id="${id}"><path d="${describeWedge(cx, rowY, innerR, start, end)}" /></clipPath>`;
+        })
+        .join('')
+      : `<clipPath id="${clipRoot}"><circle cx="${cx}" cy="${rowY}" r="${innerR}" /></clipPath>`;
+
+    // firmware/compatカテゴリは上下分割でテキスト表示
+    const isFirmware = slot.category === 'firmware';
+    const isCompat = slot.category === 'compat';
+    const isTextCategory = isFirmware || isCompat;
+    const images = isFirmware
+      ? renderFirmwareMulti(itemsSorted, cx, rowY, clipRoot)
+      : isCompat
+        ? renderCompatMulti(itemsSorted, cx, rowY, clipRoot)
+        : isMulti
+          ? itemsSorted
+            .map((item, segIdx) => {
+              const id = `${clipRoot}-${segIdx}`;
+              return renderIconOrText(item, cx, rowY, innerR, id);
+            })
+            .join('')
+          : itemsSorted[0].id === 'pitch'
+            ? `<text class="mono" x="${cx}" y="${rowY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="28" font-weight="700" fill="${ink}" dominant-baseline="middle">${itemsSorted[0].value || itemsSorted[0].abbr}</text>`
+            : renderIconOrText(itemsSorted[0], cx, rowY, innerR, clipRoot);
+
+    // firmware/compatカテゴリはspokesなし
+    const spokes = isTextCategory
+      ? ''
+      : isMulti
         ? itemsSorted
           .map((_, segIdx) => {
             const segCount = itemsSorted.length;
             const anglePer = (Math.PI * 2) / segCount;
-            const start = -Math.PI / 2 + anglePer * segIdx;
-            const end = start + anglePer;
-            const id = `${clipRoot}-${segIdx}`;
-            return `<clipPath id="${id}"><path d="${describeWedge(cx, attrRowY, innerR, start, end)}" /></clipPath>`;
+            const angle = -Math.PI / 2 + anglePer * segIdx;
+            const x = cx + innerR * Math.cos(angle);
+            const y = rowY + innerR * Math.sin(angle);
+            return `<line x1="${cx}" y1="${rowY}" x2="${x}" y2="${y}" stroke="${ink}" stroke-width="1" />`;
           })
           .join('')
-        : `<clipPath id="${clipRoot}"><circle cx="${cx}" cy="${attrRowY}" r="${innerR}" /></clipPath>`;
-
-      // firmware/compatカテゴリは上下分割でテキスト表示
-      const isFirmware = slot.category === 'firmware';
-      const isCompat = slot.category === 'compat';
-      const isTextCategory = isFirmware || isCompat;
-      const images = isFirmware
-        ? renderFirmwareMulti(itemsSorted, cx, attrRowY, clipRoot)
-        : isCompat
-          ? renderCompatMulti(itemsSorted, cx, attrRowY, clipRoot)
-          : isMulti
-            ? itemsSorted
-              .map((item, segIdx) => {
-                const id = `${clipRoot}-${segIdx}`;
-                return renderIconOrText(item, cx, attrRowY, innerR, id);
-              })
-              .join('')
-            : itemsSorted[0].id === 'pitch'
-              ? `<text class="mono" x="${cx}" y="${attrRowY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="28" font-weight="700" fill="${ink}" dominant-baseline="middle">${itemsSorted[0].value || itemsSorted[0].abbr}</text>`
-              : renderIconOrText(itemsSorted[0], cx, attrRowY, innerR, clipRoot);
-
-      // firmware/compatカテゴリはspokesなし
-      const spokes = isTextCategory
-        ? ''
-        : isMulti
-          ? itemsSorted
-            .map((_, segIdx) => {
-              const segCount = itemsSorted.length;
-              const anglePer = (Math.PI * 2) / segCount;
-              const angle = -Math.PI / 2 + anglePer * segIdx;
-              const x = cx + innerR * Math.cos(angle);
-              const y = attrRowY + innerR * Math.sin(angle);
-              return `<line x1="${cx}" y1="${attrRowY}" x2="${x}" y2="${y}" stroke="${ink}" stroke-width="1" />`;
-            })
-            .join('')
-          : '';
-
-      // Check if any icon in the slot is marked as not supported
-      const hasNotSupported = slot.items.some(item => state.notSupportedIcons.has(item.id));
-      // Draw strikethrough inside the circle (45 degree diagonal)
-      const strikeR = attrRadius - attrStroke / 2; // inner radius of white circle
-      const strikeOffset = strikeR * Math.SQRT1_2; // cos(45°) = sin(45°) = 1/√2
-      const strikethrough = hasNotSupported
-        ? `<line x1="${cx - strikeOffset}" y1="${attrRowY + strikeOffset}" x2="${cx + strikeOffset}" y2="${attrRowY - strikeOffset}" stroke="${ink}" stroke-width="${attrStroke}" stroke-linecap="round" />`
         : '';
 
-      // Check if any icon in the slot is marked as module
-      const hasModule = slot.items.some(item => state.moduleIcons.has(item.id));
-      // Draw module mark at bottom-right corner, slightly overlapping the circle (1/3 of icon size)
-      const moduleSize = Math.round(attrRadius * 2 / 3); // 約30px (アイコン直径の1/3)
-      // 円と少し被るように配置（moduleSize/3 分だけ内側に）
-      const moduleX = cx + attrRadius - moduleSize * 2 / 3;
-      const moduleY = attrRowY + attrRadius - moduleSize * 2 / 3;
-      const moduleMarkHref = resolveIconHref('module-mark');
-      const moduleMark = hasModule
-        ? `<image href="${moduleMarkHref}" x="${moduleX}" y="${moduleY}" width="${moduleSize}" height="${moduleSize}" />`
-        : '';
+    // Check if any icon in the slot is marked as not supported
+    const hasNotSupported = slot.items.some(item => state.notSupportedIcons.has(item.id));
+    // Draw strikethrough inside the circle (45 degree diagonal)
+    const strikeR = attrRadius - attrStroke / 2; // inner radius of white circle
+    const strikeOffset = strikeR * Math.SQRT1_2; // cos(45°) = sin(45°) = 1/√2
+    const strikethrough = hasNotSupported
+      ? `<line x1="${cx - strikeOffset}" y1="${rowY + strikeOffset}" x2="${cx + strikeOffset}" y2="${rowY - strikeOffset}" stroke="${ink}" stroke-width="${attrStroke}" stroke-linecap="round" />`
+      : '';
 
-      return `
-        <g aria-label="${slot.items.map((s) => s.label).join(' / ')}">
-          <defs>${defs}</defs>
-          <circle cx="${cx}" cy="${attrRowY}" r="${attrRadius}" fill="#ffffff" stroke="${ink}" stroke-width="${attrStroke}" />
-          ${images}
-          ${spokes}
-          ${strikethrough}
-          ${moduleMark}
-        </g>
-      `;
-    })
-    .join('');
+    // Check if any icon in the slot is marked as module
+    const hasModule = slot.items.some(item => state.moduleIcons.has(item.id));
+    // Draw module mark at bottom-right corner, slightly overlapping the circle (1/3 of icon size)
+    const moduleSize = Math.round(attrRadius * 2 / 3); // 約30px (アイコン直径の1/3)
+    // 円と少し被るように配置（moduleSize/3 分だけ内側に）
+    const moduleX = cx + attrRadius - moduleSize * 2 / 3;
+    const moduleY = rowY + attrRadius - moduleSize * 2 / 3;
+    const moduleMarkHref = resolveIconHref('module-mark');
+    const moduleMark = hasModule
+      ? `<image href="${moduleMarkHref}" x="${moduleX}" y="${moduleY}" width="${moduleSize}" height="${moduleSize}" />`
+      : '';
 
-  const footerPieces = slots.map((slot) => {
-    if (slot.category === 'firmware') return ['FW'];
-    const abbrs = slot.items.map((i) => formatAbbr(i.abbr)).filter(Boolean);
-    // カウントが2以上の場合は「TB×2」のように表示
-    if (slot.count && slot.count > 1) {
-      return abbrs.map(abbr => `${abbr}×${slot.count}`);
-    }
-    return abbrs;
-  });
+    return `
+      <g aria-label="${slot.items.map((s) => s.label).join(' / ')}">
+        <defs>${defs}</defs>
+        <circle cx="${cx}" cy="${rowY}" r="${attrRadius}" fill="#ffffff" stroke="${ink}" stroke-width="${attrStroke}" />
+        ${images}
+        ${spokes}
+        ${strikethrough}
+        ${moduleMark}
+      </g>
+    `;
+  }
+
+  // 両方の行のアイコンをレンダリング
+  const circles1 = row1Slots.map((slot, i) => renderSlot(slot, i, attrRow1Y, 'r1')).join('');
+  const circles2 = row2Slots.map((slot, i) => renderSlot(slot, i, attrRow2Y, 'r2')).join('');
+  const circles = circles1 + circles2;
+
+  // フッター用に各行のスロットとその位置情報を作成
+  const footerData1 = row1Slots.map((slot, idx) => ({ slot, cx: attrStartX + idx * attrSpacing }));
+  const footerData2 = row2Slots.map((slot, idx) => ({ slot, cx: attrStartX + idx * attrSpacing }));
+
+  // フッターテキストをレンダリング（bandYは帯のY位置）
+  function renderFooterText(footerDataRow, bandY) {
+    return footerDataRow.map(({ slot, cx }) => {
+      let lines;
+      if (slot.category === 'firmware') {
+        lines = ['FW'];
+      } else {
+        const abbrs = slot.items.map((i) => formatAbbr(i.abbr)).filter(Boolean);
+        if (slot.count && slot.count > 1) {
+          lines = abbrs.map(abbr => `${abbr}×${slot.count}`);
+        } else {
+          lines = abbrs;
+        }
+      }
+      if (!lines.length) return '';
+
+      const currentBandHeight = rowCount === 2 ? singleBandHeight : bandHeight;
+      const centerY = bandY + currentBandHeight / 2;
+      const maxBandInner = currentBandHeight * 0.8;
+      const fontSize = Math.min(rowCount === 2 ? 18 : 26, Math.max(12, maxBandInner / lines.length));
+      const lineHeight = fontSize + 4;
+      const startY = centerY - ((lines.length - 1) * lineHeight) / 2;
+      const tspans = lines
+        .map(
+          (txt, lineIdx) =>
+            `<tspan x="${cx}" y="${startY + lineIdx * lineHeight}">${txt}</tspan>`
+        )
+        .join('');
+      return `<text x="${cx}" y="${startY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="${fontSize}" font-weight="700" fill="${bandText}">${tspans}</text>`;
+    }).join('');
+  }
+
+  // 帯とテキストの描画
+  const bandsAndTexts = rowCount === 2
+    ? `<rect x="0" y="${band1Y}" width="${width}" height="${singleBandHeight}" fill="${band}" />
+       ${renderFooterText(footerData1, band1Y)}
+       <rect x="0" y="${band2Y}" width="${width}" height="${singleBandHeight}" fill="${band}" />
+       ${renderFooterText(footerData2, band2Y)}`
+    : `<rect x="0" y="${canvasHeight - bandHeight}" width="${width}" height="${bandHeight}" fill="${band}" />
+       ${renderFooterText(footerData1, canvasHeight - bandHeight)}`;
 
   const svgMarkup = `
     <rect width="${width}" height="${canvasHeight}" fill="${bg}" />
     <g>
       ${circles}
-      <rect x="0" y="${canvasHeight - bandHeight}" width="${width}" height="${bandHeight}" fill="${band}" />
-      ${footerPieces
-      .map((lines, idx) => {
-        if (!lines.length) return '';
-        const cx = attrStartX + idx * attrSpacing;
-        const centerY = canvasHeight - bandHeight / 2;
-        const maxBandInner = bandHeight * 0.8;
-        const fontSize = Math.min(26, Math.max(14, maxBandInner / lines.length));
-        const lineHeight = fontSize + 4;
-        const startY = centerY - ((lines.length - 1) * lineHeight) / 2;
-        const tspans = lines
-          .map(
-            (txt, lineIdx) =>
-              `<tspan x="${cx}" y="${startY + lineIdx * lineHeight}">${txt}</tspan>`
-          )
-          .join('');
-        return `<text x="${cx}" y="${startY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="${fontSize}" font-weight="700" fill="${bandText}">${tspans}</text>`;
-      })
-      .join('')}
+      ${bandsAndTexts}
       <circle cx="${mainCx}" cy="${mainCy}" r="${mainBgOuterRadius}" fill="${bg}" />
       <circle cx="${mainCx}" cy="${mainCy}" r="${mainBlackOuterRadius}" fill="${ink}" />
       <circle cx="${mainCx}" cy="${mainCy}" r="${mainWhiteRadius}" fill="#ffffff" />
@@ -1439,6 +1507,19 @@ function wireUI() {
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', toggleTheme);
   }
+
+  // Row count buttons
+  const rowCountBtns = document.querySelectorAll('.row-count-btn');
+  rowCountBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const rows = parseInt(btn.dataset.rows, 10);
+      state.rowCount = rows;
+      rowCountBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderBadge();
+      saveStateToURL();
+    });
+  });
 
   document.getElementById('main-label').addEventListener('input', (e) => {
     setMainLabel(e.target.value.toUpperCase());

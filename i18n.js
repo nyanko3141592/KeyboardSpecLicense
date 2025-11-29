@@ -6,6 +6,10 @@ export const translations = {
     'header.title': '自作キーボードのスペックバッジを即生成',
     'header.lede': '左のフォームを設定すると右のバッジがリアルタイムで更新されます。',
 
+    // 行数
+    'rowCount.label': '行数',
+    'rowCount.hint': '2行にするとアイコンを上下2段に分けて表示します。',
+
     // メインラベル
     'main.label': 'キー数（メイン表示）',
     'main.placeholder': '42',
@@ -104,6 +108,10 @@ export const translations = {
     'header.eyebrow': 'KeySpec Generator',
     'header.title': 'Instantly Generate Custom Keyboard Spec Badges',
     'header.lede': 'Configure the form on the left and the badge updates in real-time on the right.',
+
+    // Row count
+    'rowCount.label': 'Rows',
+    'rowCount.hint': 'Setting to 2 rows splits icons into upper and lower rows.',
 
     // Main label
     'main.label': 'Key Count (Main Display)',
