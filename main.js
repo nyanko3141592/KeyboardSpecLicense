@@ -127,7 +127,7 @@ const palette = [
     id: 'compat-chocv1',
     category: 'compat',
     label: 'Kailh Choc v1',
-    abbr: 'C1',
+    abbr: 'V1',
     description_ja: '薄型Choc v1専用。MXやChoc v2とは非互換のロープロ仕様。',
     description_en: 'Low-profile Choc v1 exclusive. Incompatible with MX and Choc v2.',
   },
@@ -135,7 +135,7 @@ const palette = [
     id: 'compat-chocv2',
     category: 'compat',
     label: 'Kailh Choc v2',
-    abbr: 'C2',
+    abbr: 'V2',
     description_ja: 'Choc v2専用キーキャップと互換。v1/MXとは非互換。',
     description_en: 'Compatible with Choc v2 keycaps. Incompatible with v1/MX.',
   },
@@ -563,6 +563,11 @@ function renderIconOrText(item, cx, cy, innerR, clipId) {
     const label = item.label || item.id.toUpperCase();
     return `<text x="${cx}" y="${cy + 2}" text-anchor="middle" font-family="${'Space Grotesk'}" font-size="28" font-weight="700" fill="#000" dominant-baseline="middle" clip-path="url(#${clipId})">${label}</text>`;
   }
+  // Compatカテゴリはテキスト表示（MX/V1/V2）
+  if (item.category === 'compat') {
+    const label = item.abbr || item.id.toUpperCase();
+    return `<text x="${cx}" y="${cy + 2}" text-anchor="middle" font-family="${'Space Grotesk'}" font-size="28" font-weight="700" fill="#000" dominant-baseline="middle" clip-path="url(#${clipId})">${label}</text>`;
+  }
   // Batteryカテゴリは画像を表示（battery-aaaの場合のみテキストを重ねる）
   if (item.category === 'battery') {
     const imgMarkup = `<image href="${resolveIconHref(item.id)}" x="${cx - innerR}" y="${cy - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice" />`;
@@ -593,6 +598,27 @@ function renderFirmwareMulti(items, cx, cy, clipRoot) {
 
   return items.map((item, idx) => {
     const label = item.label || item.id.toUpperCase();
+    const y = startY + idx * lineHeight;
+    return `<text x="${cx}" y="${y + 2}" text-anchor="middle" font-family="Space Grotesk" font-size="${fontSize}" font-weight="700" fill="#000" dominant-baseline="middle" clip-path="url(#${clipRoot})">${label}</text>`;
+  }).join('');
+}
+
+// Compat用：複数選択時に上下分割でテキスト表示（abbr使用）
+function renderCompatMulti(items, cx, cy, clipRoot) {
+  const count = items.length;
+  if (count === 1) {
+    const label = items[0].abbr || items[0].id.toUpperCase();
+    return `<text x="${cx}" y="${cy + 2}" text-anchor="middle" font-family="Space Grotesk" font-size="28" font-weight="700" fill="#000" dominant-baseline="middle">${label}</text>`;
+  }
+
+  // 上下に分割して表示
+  const fontSize = count <= 2 ? 20 : 16;
+  const lineHeight = fontSize + 4;
+  const totalHeight = count * lineHeight;
+  const startY = cy - totalHeight / 2 + lineHeight / 2;
+
+  return items.map((item, idx) => {
+    const label = item.abbr || item.id.toUpperCase();
     const y = startY + idx * lineHeight;
     return `<text x="${cx}" y="${y + 2}" text-anchor="middle" font-family="Space Grotesk" font-size="${fontSize}" font-weight="700" fill="#000" dominant-baseline="middle" clip-path="url(#${clipRoot})">${label}</text>`;
   }).join('');
@@ -868,23 +894,27 @@ function renderBadge() {
           .join('')
         : `<clipPath id="${clipRoot}"><circle cx="${cx}" cy="${attrRowY}" r="${innerR}" /></clipPath>`;
 
-      // firmwareカテゴリは上下分割で表示
+      // firmware/compatカテゴリは上下分割でテキスト表示
       const isFirmware = slot.category === 'firmware';
+      const isCompat = slot.category === 'compat';
+      const isTextCategory = isFirmware || isCompat;
       const images = isFirmware
         ? renderFirmwareMulti(itemsSorted, cx, attrRowY, clipRoot)
-        : isMulti
-          ? itemsSorted
-            .map((item, segIdx) => {
-              const id = `${clipRoot}-${segIdx}`;
-              return renderIconOrText(item, cx, attrRowY, innerR, id);
-            })
-            .join('')
-          : itemsSorted[0].id === 'pitch'
-            ? `<text class="mono" x="${cx}" y="${attrRowY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="28" font-weight="700" fill="${ink}" dominant-baseline="middle">${itemsSorted[0].value || itemsSorted[0].abbr}</text>`
-            : renderIconOrText(itemsSorted[0], cx, attrRowY, innerR, clipRoot);
+        : isCompat
+          ? renderCompatMulti(itemsSorted, cx, attrRowY, clipRoot)
+          : isMulti
+            ? itemsSorted
+              .map((item, segIdx) => {
+                const id = `${clipRoot}-${segIdx}`;
+                return renderIconOrText(item, cx, attrRowY, innerR, id);
+              })
+              .join('')
+            : itemsSorted[0].id === 'pitch'
+              ? `<text class="mono" x="${cx}" y="${attrRowY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="28" font-weight="700" fill="${ink}" dominant-baseline="middle">${itemsSorted[0].value || itemsSorted[0].abbr}</text>`
+              : renderIconOrText(itemsSorted[0], cx, attrRowY, innerR, clipRoot);
 
-      // firmwareカテゴリはspokesなし
-      const spokes = isFirmware
+      // firmware/compatカテゴリはspokesなし
+      const spokes = isTextCategory
         ? ''
         : isMulti
           ? itemsSorted
