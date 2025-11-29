@@ -55,8 +55,6 @@ export const translations = {
     'icon.pointing-td.desc': '指でなぞりカーソル移動やジェスチャー操作が可能。',
     'icon.firmware-qmk.desc': '有線で広く使われる多機能OSSファームウェア。',
     'icon.firmware-zmk.desc': '無線や省電力構成に適したモダンOSSファームウェア。',
-    'icon.firmware-via.desc': 'GUIでキーマップ編集ができる設定ツール。対応ファームで動作。',
-    'icon.firmware-vial.desc': 'VIA互換の上位版。より多機能でセキュアなキーマップ管理が可能。',
     'icon.feature-ec.desc': '回転ノブで音量/スクロール/レイヤー切替などに割り当て可能。',
     'icon.feature-dp.desc': 'OLED/電子ペーパー等でレイヤー・バッテリー・ロゴを表示。',
 
@@ -134,8 +132,6 @@ export const translations = {
     'icon.pointing-td.desc': 'Swipe finger for cursor movement and gesture operations.',
     'icon.firmware-qmk.desc': 'Feature-rich OSS firmware widely used for wired keyboards.',
     'icon.firmware-zmk.desc': 'Modern OSS firmware suitable for wireless and low-power configurations.',
-    'icon.firmware-via.desc': 'GUI-based keymap editing tool. Works with compatible firmware.',
-    'icon.firmware-vial.desc': 'VIA-compatible advanced version. More features and secure keymap management.',
     'icon.feature-ec.desc': 'Rotary knob assignable to volume/scroll/layer switching etc.',
     'icon.feature-dp.desc': 'Display layer/battery/logo on OLED/e-paper etc.',
 

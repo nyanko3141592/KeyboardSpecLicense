@@ -180,22 +180,6 @@ const palette = [
     description_ja: '無線や省電力構成に適したモダンOSSファームウェア。',
     description_en: 'Modern OSS firmware suitable for wireless and low-power configurations.',
   },
-  {
-    id: 'firmware-via',
-    category: 'firmware',
-    label: 'VIA',
-    abbr: 'FW',
-    description_ja: 'GUIでキーマップ編集ができる設定ツール。対応ファームで動作。',
-    description_en: 'GUI-based keymap editing tool. Works with compatible firmware.',
-  },
-  {
-    id: 'firmware-vial',
-    category: 'firmware',
-    label: 'VIAL',
-    abbr: 'FW',
-    description_ja: 'VIA互換の上位版。より多機能でセキュアなキーマップ管理が可能。',
-    description_en: 'VIA-compatible advanced version. More features and secure keymap management.',
-  },
 
   // 8. 拡張機能 (Features)
   {
