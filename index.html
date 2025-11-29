@@ -13,14 +13,6 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <button class="theme-toggle-fixed" id="theme-toggle-btn" aria-label="テーマ切り替え" data-i18n-aria="button.themeToggle">
-      <span class="theme-icon">☀️</span>
-    </button>
-
-    <button class="lang-toggle-fixed" id="lang-toggle-btn" aria-label="言語切り替え">
-      <span class="lang-text">EN</span>
-    </button>
-
     <header class="topbar">
       <div>
         <p class="eyebrow" data-i18n="header.eyebrow">KeySpec Generator</p>
@@ -28,6 +20,14 @@
         <p class="lede" data-i18n="header.lede">
           左のフォームを設定すると右のバッジがリアルタイムで更新されます。
         </p>
+      </div>
+      <div class="header-buttons">
+        <button class="lang-toggle-fixed" id="lang-toggle-btn" aria-label="言語切り替え">
+          <span class="lang-text">EN</span>
+        </button>
+        <button class="theme-toggle-fixed" id="theme-toggle-btn" aria-label="テーマ切り替え" data-i18n-aria="button.themeToggle">
+          <span class="theme-icon">☀️</span>
+        </button>
       </div>
     </header>
 
@@ -175,8 +175,8 @@
       <section class="panel preview" aria-label="プレビュー">
         <div class="preview-canvas" id="preview-area">
           <svg id="badge-svg" role="img" aria-label="KeySpec badge"></svg>
-          <button id="download-image" class="floating-download" aria-label="画像を保存" data-i18n="button.download" data-i18n-aria="button.download">保存</button>
         </div>
+        <button id="download-image" class="floating-download" aria-label="画像を保存" data-i18n="button.download" data-i18n-aria="button.download">保存</button>
       </section>
     </main>
 
