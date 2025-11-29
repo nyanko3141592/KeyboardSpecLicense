@@ -421,6 +421,7 @@ function finalizeSelection() {
   renderSelected();
   renderBadge();
   syncFooterField();
+  saveStateToURL();
 }
 
 function setPitch() {
@@ -531,6 +532,119 @@ function setTheme(theme) {
 function toggleTheme() {
   const newTheme = state.theme === 'light' ? 'dark' : 'light';
   setTheme(newTheme);
+}
+
+// URLパラメータに状態を保存
+function saveStateToURL() {
+  const params = new URLSearchParams();
+
+  // メインラベル
+  if (state.mainLabel && state.mainLabel !== '42') {
+    params.set('label', state.mainLabel);
+  }
+
+  // ピッチ
+  if (state.pitchValue && state.pitchValue !== '19mm') {
+    params.set('pitch', state.pitchValue);
+  }
+  if (state.pitchAbbr && state.pitchAbbr !== 'KP') {
+    params.set('pitchAbbr', state.pitchAbbr);
+  }
+
+  // 選択されたアイコン（カスタム以外）
+  const iconIds = state.selectedIcons
+    .filter(i => !i.id.startsWith('custom-') && i.category !== 'pitch')
+    .map(i => i.id)
+    .join(',');
+  if (iconIds) {
+    params.set('icons', iconIds);
+  }
+
+  // フッターテキスト（カスタムの場合のみ）
+  if (state.footerIsCustom && state.footerText) {
+    params.set('footer', state.footerText);
+  }
+
+  // URLを更新（リロードなし）
+  const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+  window.history.replaceState({}, '', newUrl);
+
+  return newUrl;
+}
+
+// URLパラメータから状態を復元
+function loadStateFromURL() {
+  const params = new URLSearchParams(window.location.search);
+
+  // メインラベル
+  const label = params.get('label');
+  if (label) {
+    state.mainLabel = label;
+    document.getElementById('main-label').value = label;
+  }
+
+  // ピッチ
+  const pitch = params.get('pitch');
+  if (pitch) {
+    state.pitchValue = pitch;
+    document.getElementById('pitch-input').value = pitch;
+  }
+
+  const pitchAbbr = params.get('pitchAbbr');
+  if (pitchAbbr) {
+    state.pitchAbbr = pitchAbbr;
+    document.getElementById('pitch-abbr').value = pitchAbbr;
+  }
+
+  // アイコン
+  const icons = params.get('icons');
+  if (icons) {
+    const iconIds = icons.split(',').filter(Boolean);
+    state.selectedIcons = iconIds
+      .map(id => findIcon(id))
+      .filter(Boolean);
+  }
+
+  // ピッチをアイコンに追加
+  if (pitch) {
+    const payload = { id: 'pitch', category: 'pitch', label: 'Pitch', abbr: state.pitchAbbr, value: state.pitchValue };
+    const existingIndex = state.selectedIcons.findIndex((i) => i.category === 'pitch');
+    if (existingIndex >= 0) {
+      state.selectedIcons.splice(existingIndex, 1, payload);
+    } else {
+      state.selectedIcons.push(payload);
+    }
+  }
+
+  // フッター
+  const footer = params.get('footer');
+  if (footer) {
+    state.footerText = footer;
+    state.footerIsCustom = true;
+  } else {
+    state.footerText = buildFooterText();
+    state.footerIsCustom = false;
+  }
+
+  return params.toString().length > 0;
+}
+
+// 共有用URLを取得
+function getShareableURL() {
+  saveStateToURL();
+  return window.location.href;
+}
+
+// URLをクリップボードにコピー
+async function copyShareURL() {
+  const url = getShareableURL();
+  try {
+    await navigator.clipboard.writeText(url);
+    return true;
+  } catch (err) {
+    console.error('Failed to copy URL:', err);
+    return false;
+  }
 }
 
 function formatAbbr(abbr) {
@@ -708,6 +822,7 @@ function setMainLabel(value) {
   if (!state.footerIsCustom) state.footerText = buildFooterText();
   syncFooterField();
   renderBadge();
+  saveStateToURL();
 }
 
 function setMainImageDataUrl(dataUrl) {
@@ -879,6 +994,26 @@ function wireUI() {
   footerField.addEventListener('input', (e) => handleFooterChange(e.target.value));
   document.getElementById('reset-footer').addEventListener('click', resetFooter);
 
+  // 共有ボタン
+  const shareBtn = document.getElementById('share-url-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', async () => {
+      const success = await copyShareURL();
+      const lang = state.language || getCurrentLanguage();
+      const message = success ? t('share.copied', lang) : t('share.failed', lang);
+
+      // 一時的にボタンのテキストを変更してフィードバック
+      const originalText = shareBtn.textContent;
+      shareBtn.textContent = message;
+      shareBtn.disabled = true;
+
+      setTimeout(() => {
+        shareBtn.textContent = originalText;
+        shareBtn.disabled = false;
+      }, 2000);
+    });
+  }
+
   const downloadImgBtn = document.getElementById('download-image');
   if (downloadImgBtn) downloadImgBtn.addEventListener('click', () => downloadPng(2000));
 
@@ -931,7 +1066,15 @@ function init() {
     renderBadge();
     loadIconPreviews();
   });
-  bootstrapDefaults();
+
+  // URLパラメータから状態を復元（URLがある場合）
+  const hasUrlParams = loadStateFromURL();
+
+  // URLパラメータがない場合のみデフォルト値を設定
+  if (!hasUrlParams) {
+    bootstrapDefaults();
+  }
+
   updatePaletteUI();
   renderSelected();
   renderBadge();

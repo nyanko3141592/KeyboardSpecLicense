@@ -71,6 +71,12 @@ export const translations = {
     // ボタン
     'button.download': '保存',
     'button.themeToggle': 'テーマ切り替え',
+
+    // 共有
+    'share.button': 'URLで共有',
+    'share.hint': '現在の設定を含むURLをクリップボードにコピーします',
+    'share.copied': 'URLをコピーしました！',
+    'share.failed': 'コピーに失敗しました',
   },
 
   en: {
@@ -144,6 +150,12 @@ export const translations = {
     // Buttons
     'button.download': 'Save',
     'button.themeToggle': 'Toggle Theme',
+
+    // Share
+    'share.button': 'Share via URL',
+    'share.hint': 'Copy URL with current settings to clipboard',
+    'share.copied': 'URL copied to clipboard!',
+    'share.failed': 'Failed to copy URL',
   }
 };
 
