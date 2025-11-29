@@ -807,6 +807,52 @@ button.primary:disabled {
   letter-spacing: 0.05em;
 }
 
+.selected-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.not-supported-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  background: var(--panel-secondary);
+  border: 1.5px solid var(--line);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.not-supported-btn:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+  background: var(--panel);
+}
+
+.not-supported-btn.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.not-supported-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.selected-list li.not-supported {
+  opacity: 0.6;
+}
+
+.selected-list li.not-supported::before {
+  background: var(--muted);
+}
+
 .row {
   display: flex;
   align-items: center;

@@ -9,6 +9,7 @@ const state = {
   mainImageUrl: '',
   customIconMap: {},
   selectedIcons: [],
+  notSupportedIcons: new Set(),
   footerText: '',
   footerIsCustom: false,
 };
@@ -430,17 +431,40 @@ function setPitch() {
 function renderSelected() {
   selectedList.innerHTML = '';
   const ordered = getOrderedIcons();
-  ordered.forEach((icon, index) => {
+  ordered.forEach((icon) => {
     const li = document.createElement('li');
+    const isNotSupported = state.notSupportedIcons.has(icon.id);
+    if (isNotSupported) li.classList.add('not-supported');
+
     const info = document.createElement('div');
     const desc = icon.description ? `<div class="desc">${icon.description}</div>` : '';
     info.innerHTML = `<div class="label">${icon.label || 'Pitch'}</div><div class="meta">${icon.abbr} / ${icon.category}</div>${desc}`;
+
+    const actions = document.createElement('div');
+    actions.className = 'selected-actions';
+
+    const toggleNotSupported = document.createElement('button');
+    toggleNotSupported.className = `not-supported-btn${isNotSupported ? ' active' : ''}`;
+    toggleNotSupported.setAttribute('aria-label', t('selected.notSupported'));
+    toggleNotSupported.setAttribute('title', t('selected.notSupported'));
+    toggleNotSupported.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><line x1="3.5" y1="12.5" x2="12.5" y2="3.5" stroke="currentColor" stroke-width="1.5"/></svg>`;
+    toggleNotSupported.addEventListener('click', () => {
+      if (state.notSupportedIcons.has(icon.id)) {
+        state.notSupportedIcons.delete(icon.id);
+      } else {
+        state.notSupportedIcons.add(icon.id);
+      }
+      renderSelected();
+      renderBadge();
+      saveStateToURL();
+    });
 
     const remove = document.createElement('button');
     remove.textContent = '削除';
     remove.addEventListener('click', () => {
       const idx = state.selectedIcons.findIndex((i) => i.id === icon.id);
       if (idx >= 0) state.selectedIcons.splice(idx, 1);
+      state.notSupportedIcons.delete(icon.id);
       if (!state.footerIsCustom) state.footerText = buildFooterText();
       renderSelected();
       renderBadge();
@@ -448,8 +472,11 @@ function renderSelected() {
       syncFooterField();
     });
 
+    actions.appendChild(toggleNotSupported);
+    actions.appendChild(remove);
+
     li.appendChild(info);
-    li.appendChild(remove);
+    li.appendChild(actions);
     selectedList.appendChild(li);
   });
 }
@@ -544,6 +571,12 @@ function saveStateToURL() {
     params.set('icons', iconIds);
   }
 
+  // 非対応アイコン
+  const notSupportedIds = Array.from(state.notSupportedIcons).join(',');
+  if (notSupportedIds) {
+    params.set('notSupported', notSupportedIds);
+  }
+
   // フッターテキスト（カスタムの場合のみ）
   if (state.footerIsCustom && state.footerText) {
     params.set('footer', state.footerText);
@@ -598,6 +631,13 @@ function loadStateFromURL() {
     } else {
       state.selectedIcons.push(payload);
     }
+  }
+
+  // 非対応アイコン
+  const notSupported = params.get('notSupported');
+  if (notSupported) {
+    const notSupportedIds = notSupported.split(',').filter(Boolean);
+    state.notSupportedIcons = new Set(notSupportedIds);
   }
 
   // フッター
@@ -744,12 +784,22 @@ function renderBadge() {
           .join('')
         : '';
 
+      // Check if any icon in the slot is marked as not supported
+      const hasNotSupported = slot.items.some(item => state.notSupportedIcons.has(item.id));
+      // Draw strikethrough inside the circle (45 degree diagonal)
+      const strikeR = attrRadius - attrStroke / 2; // inner radius of white circle
+      const strikeOffset = strikeR * Math.SQRT1_2; // cos(45°) = sin(45°) = 1/√2
+      const strikethrough = hasNotSupported
+        ? `<line x1="${cx - strikeOffset}" y1="${attrRowY + strikeOffset}" x2="${cx + strikeOffset}" y2="${attrRowY - strikeOffset}" stroke="${ink}" stroke-width="${attrStroke}" stroke-linecap="round" />`
+        : '';
+
       return `
         <g aria-label="${slot.items.map((s) => s.label).join(' / ')}">
           <defs>${defs}</defs>
           <circle cx="${cx}" cy="${attrRowY}" r="${attrRadius}" fill="#ffffff" stroke="${ink}" stroke-width="${attrStroke}" />
           ${images}
           ${spokes}
+          ${strikethrough}
         </g>
       `;
     })

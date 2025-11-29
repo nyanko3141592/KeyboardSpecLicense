@@ -60,6 +60,7 @@ export const translations = {
 
     // 選択済みアイコン
     'selected.label': '選択済みアイコン',
+    'selected.notSupported': '非対応',
 
     // フッター
     'footer.label': '下部帯テキスト',
@@ -137,6 +138,7 @@ export const translations = {
 
     // Selected icons
     'selected.label': 'Selected Icons',
+    'selected.notSupported': 'Not Supported',
 
     // Footer
     'footer.label': 'Footer Text',
