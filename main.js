@@ -14,6 +14,8 @@ const state = {
   footerText: '',
   footerIsCustom: false,
   batteryText: 'AAA',
+  freeformIcons: [], // { id, type: 'image'|'text', data, abbr }
+  freeformIdCounter: 0,
 };
 
 const paletteButtons = Array.from(document.querySelectorAll('button[data-icon-id]'));
@@ -313,8 +315,9 @@ const categoryOrder = [
   'firmware',
   'features',
   'battery',
+  'freeform',
 ];
-const multiSelectCategories = new Set(['connect', 'compat', 'pointing', 'firmware', 'features']);
+const multiSelectCategories = new Set(['connect', 'compat', 'pointing', 'firmware', 'features', 'freeform']);
 
 function startCustomIcon(category) {
   if (customIconFileInput) {
@@ -344,6 +347,262 @@ function finishCustomIcon(category, src) {
     state.selectedIcons.push(icon);
   }
   finalizeSelection();
+}
+
+// Freeform icon functions
+let pendingFreeformImage = null;
+let editingFreeformId = null;
+
+function showFreeformInputForm(type, imageData = null) {
+  const form = document.getElementById('freeform-input-form');
+  const addControls = document.getElementById('freeform-add-controls');
+  const iconTextEl = document.getElementById('freeform-icon-text');
+  const abbrTextEl = document.getElementById('freeform-abbr-text');
+  const confirmBtn = document.getElementById('freeform-confirm-btn');
+
+  if (!form || !addControls) return;
+
+  // 編集モードをリセット
+  editingFreeformId = null;
+
+  // フォームを表示、追加ボタンを非表示
+  form.style.display = 'block';
+  addControls.style.display = 'none';
+
+  // ボタンテキストを「追加」に
+  if (confirmBtn) {
+    const lang = state.language || getCurrentLanguage();
+    confirmBtn.textContent = lang === 'ja' ? '追加' : 'Add';
+  }
+
+  // 入力をリセット
+  iconTextEl.value = '';
+  abbrTextEl.value = '';
+
+  if (type === 'image' && imageData) {
+    pendingFreeformImage = imageData;
+    iconTextEl.value = '[Image]';
+    iconTextEl.disabled = true;
+    abbrTextEl.value = 'IMG';
+  } else {
+    pendingFreeformImage = null;
+    iconTextEl.disabled = false;
+    iconTextEl.placeholder = 'TEXT';
+    abbrTextEl.value = '';
+  }
+
+  // フォーカス
+  if (type === 'text') {
+    iconTextEl.focus();
+  } else {
+    abbrTextEl.focus();
+  }
+}
+
+function editFreeformIcon(id) {
+  const icon = state.freeformIcons.find(i => i.id === id);
+  if (!icon) return;
+
+  const form = document.getElementById('freeform-input-form');
+  const addControls = document.getElementById('freeform-add-controls');
+  const iconTextEl = document.getElementById('freeform-icon-text');
+  const abbrTextEl = document.getElementById('freeform-abbr-text');
+  const confirmBtn = document.getElementById('freeform-confirm-btn');
+
+  if (!form || !addControls) return;
+
+  // 編集モードを設定
+  editingFreeformId = id;
+
+  // フォームを表示、追加ボタンを非表示
+  form.style.display = 'block';
+  addControls.style.display = 'none';
+
+  // ボタンテキストを「更新」に
+  if (confirmBtn) {
+    const lang = state.language || getCurrentLanguage();
+    confirmBtn.textContent = lang === 'ja' ? '更新' : 'Update';
+  }
+
+  // 既存の値をセット
+  if (icon.type === 'image') {
+    pendingFreeformImage = icon.data;
+    iconTextEl.value = '[Image]';
+    iconTextEl.disabled = true;
+  } else {
+    pendingFreeformImage = null;
+    iconTextEl.value = icon.data;
+    iconTextEl.disabled = false;
+  }
+  abbrTextEl.value = icon.abbr;
+
+  // フォーカス
+  abbrTextEl.focus();
+}
+
+function hideFreeformInputForm() {
+  const form = document.getElementById('freeform-input-form');
+  const addControls = document.getElementById('freeform-add-controls');
+  const iconTextEl = document.getElementById('freeform-icon-text');
+
+  if (!form || !addControls) return;
+
+  form.style.display = 'none';
+  addControls.style.display = 'flex';
+  pendingFreeformImage = null;
+  editingFreeformId = null;
+  iconTextEl.disabled = false;
+}
+
+function confirmFreeformIcon() {
+  const iconTextEl = document.getElementById('freeform-icon-text');
+  const abbrTextEl = document.getElementById('freeform-abbr-text');
+
+  const abbr = abbrTextEl.value.trim() || 'FF';
+
+  // 編集モードの場合
+  if (editingFreeformId) {
+    const icon = state.freeformIcons.find(i => i.id === editingFreeformId);
+    if (icon) {
+      // テキストアイコンの場合はテキストも更新
+      if (icon.type === 'text') {
+        const text = iconTextEl.value.trim();
+        if (!text) {
+          hideFreeformInputForm();
+          return;
+        }
+        icon.data = text;
+      }
+      icon.abbr = abbr;
+
+      // selectedIconsのabbrも更新
+      const selectedIcon = state.selectedIcons.find(i => i.id === editingFreeformId);
+      if (selectedIcon) {
+        selectedIcon.abbr = abbr;
+      }
+    }
+
+    hideFreeformInputForm();
+    updateFreeformListUI();
+    finalizeSelection();
+    return;
+  }
+
+  // 新規追加モード
+  if (pendingFreeformImage) {
+    // 画像アイコンを追加
+    const id = `freeform-${state.freeformIdCounter++}`;
+    const icon = {
+      id,
+      type: 'image',
+      data: pendingFreeformImage,
+      abbr,
+    };
+    state.freeformIcons.push(icon);
+    state.customIconMap[id] = pendingFreeformImage;
+
+    state.selectedIcons.push({
+      id,
+      category: 'freeform',
+      label: 'Freeform',
+      abbr,
+    });
+  } else {
+    // テキストアイコンを追加
+    const text = iconTextEl.value.trim();
+    if (!text) {
+      hideFreeformInputForm();
+      return;
+    }
+
+    const id = `freeform-${state.freeformIdCounter++}`;
+    const icon = {
+      id,
+      type: 'text',
+      data: text,
+      abbr: abbr || text.split('\n')[0].substring(0, 4).toUpperCase(),
+    };
+    state.freeformIcons.push(icon);
+
+    state.selectedIcons.push({
+      id,
+      category: 'freeform',
+      label: 'Freeform',
+      abbr: icon.abbr,
+    });
+  }
+
+  hideFreeformInputForm();
+  updateFreeformListUI();
+  finalizeSelection();
+}
+
+function removeFreeformIcon(id) {
+  const idx = state.freeformIcons.findIndex((i) => i.id === id);
+  if (idx >= 0) {
+    state.freeformIcons.splice(idx, 1);
+  }
+  delete state.customIconMap[id];
+
+  // selectedIconsからも削除
+  const selectedIdx = state.selectedIcons.findIndex((i) => i.id === id);
+  if (selectedIdx >= 0) {
+    state.selectedIcons.splice(selectedIdx, 1);
+  }
+
+  updateFreeformListUI();
+  finalizeSelection();
+}
+
+function updateFreeformListUI() {
+  const listEl = document.getElementById('freeform-list');
+  if (!listEl) return;
+
+  listEl.innerHTML = '';
+
+  state.freeformIcons.forEach((icon) => {
+    const row = document.createElement('div');
+    row.className = 'freeform-item';
+    row.dataset.freeformId = icon.id;
+
+    const preview = document.createElement('span');
+    preview.className = 'freeform-preview';
+    if (icon.type === 'image') {
+      preview.style.backgroundImage = `url(${icon.data})`;
+      preview.style.backgroundSize = 'cover';
+      preview.style.backgroundPosition = 'center';
+    } else {
+      // 複数行の場合は最初の行だけプレビュー表示
+      const firstLine = icon.data.split('\n')[0];
+      preview.textContent = firstLine.length > 4 ? firstLine.substring(0, 4) : firstLine;
+      preview.classList.add('freeform-text-preview');
+    }
+
+    const label = document.createElement('span');
+    label.className = 'freeform-label';
+    // 複数行テキストは改行を「↵」で表示
+    const displayData = icon.type === 'text' ? icon.data.replace(/\n/g, '↵') : 'Image';
+    label.textContent = `${displayData} · ${icon.abbr}`;
+
+    const editBtn = document.createElement('button');
+    editBtn.type = 'button';
+    editBtn.className = 'freeform-edit-btn';
+    editBtn.textContent = '✎';
+    editBtn.title = state.language === 'ja' ? '編集' : 'Edit';
+    editBtn.addEventListener('click', () => editFreeformIcon(icon.id));
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'freeform-remove-btn';
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', () => removeFreeformIcon(icon.id));
+
+    row.appendChild(preview);
+    row.appendChild(label);
+    row.appendChild(editBtn);
+    row.appendChild(removeBtn);
+    listEl.appendChild(row);
+  });
 }
 
 function bootstrapDefaults() {
@@ -578,6 +837,34 @@ function renderIconOrText(item, cx, cy, innerR, clipId) {
       return imgMarkup + textMarkup;
     }
     return imgMarkup;
+  }
+  // Freeformカテゴリ - テキストタイプの場合
+  if (item.category === 'freeform') {
+    const freeformIcon = state.freeformIcons.find(f => f.id === item.id);
+    if (freeformIcon && freeformIcon.type === 'text') {
+      const text = freeformIcon.data || '';
+      const lines = text.split('\n');
+      const lineCount = lines.length;
+
+      if (lineCount === 1) {
+        // 単一行の場合
+        const fontSize = text.length <= 2 ? 28 : text.length <= 4 ? 22 : 16;
+        return `<text x="${cx}" y="${cy + 2}" text-anchor="middle" font-family="Space Grotesk" font-size="${fontSize}" font-weight="700" fill="#000" dominant-baseline="middle" clip-path="url(#${clipId})">${text}</text>`;
+      } else {
+        // 複数行の場合
+        const maxLen = Math.max(...lines.map(l => l.length));
+        const fontSize = maxLen <= 2 ? 20 : maxLen <= 4 ? 16 : 12;
+        const lineHeight = fontSize + 4;
+        const totalHeight = lineCount * lineHeight;
+        const startY = cy - totalHeight / 2 + lineHeight / 2;
+
+        return lines.map((line, idx) => {
+          const y = startY + idx * lineHeight;
+          return `<text x="${cx}" y="${y + 2}" text-anchor="middle" font-family="Space Grotesk" font-size="${fontSize}" font-weight="700" fill="#000" dominant-baseline="middle" clip-path="url(#${clipId})">${line}</text>`;
+        }).join('');
+      }
+    }
+    // 画像タイプはcustomIconMapから取得
   }
   return `<image href="${resolveIconHref(item.id)}" x="${cx - innerR}" y="${cy - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice" />`;
 }
@@ -1286,6 +1573,46 @@ function wireUI() {
     reader.readAsDataURL(file);
     customIconFileInput.value = '';
   });
+
+  // Freeform icon controls
+  const freeformAddImageBtn = document.getElementById('freeform-add-image');
+  const freeformAddTextBtn = document.getElementById('freeform-add-text');
+  const freeformFileInput = document.getElementById('freeform-icon-file');
+  const freeformCancelBtn = document.getElementById('freeform-cancel-btn');
+  const freeformConfirmBtn = document.getElementById('freeform-confirm-btn');
+
+  if (freeformAddImageBtn) {
+    freeformAddImageBtn.addEventListener('click', () => {
+      if (freeformFileInput) {
+        freeformFileInput.click();
+      }
+    });
+  }
+
+  if (freeformAddTextBtn) {
+    freeformAddTextBtn.addEventListener('click', () => {
+      showFreeformInputForm('text');
+    });
+  }
+
+  if (freeformFileInput) {
+    freeformFileInput.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => showFreeformInputForm('image', reader.result);
+      reader.readAsDataURL(file);
+      freeformFileInput.value = '';
+    });
+  }
+
+  if (freeformCancelBtn) {
+    freeformCancelBtn.addEventListener('click', hideFreeformInputForm);
+  }
+
+  if (freeformConfirmBtn) {
+    freeformConfirmBtn.addEventListener('click', confirmFreeformIcon);
+  }
 }
 
 function loadIconPreviews() {

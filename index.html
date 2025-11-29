@@ -273,6 +273,40 @@
             </div>
             <div class="group-desc" data-desc-for="battery" data-i18n="palette.unselected">このカテゴリは未選択です。</div>
           </div>
+
+          <div class="palette-group" data-category-group="freeform">
+            <h3 data-i18n="category.freeform">自由アイコン (Freeform)</h3>
+            <div class="freeform-list" id="freeform-list">
+              <!-- 動的に追加されるアイコンがここに表示される -->
+            </div>
+            <div class="freeform-input-form" id="freeform-input-form" style="display: none;">
+              <div class="freeform-input-row">
+                <label data-i18n="freeform.iconLabel">アイコン内容</label>
+                <textarea id="freeform-icon-text" rows="2" placeholder="TEXT" data-i18n-placeholder="freeform.iconPlaceholder"></textarea>
+                <span class="hint" data-i18n-hint="freeform.iconHint">複数行可。画像の場合は自動設定。</span>
+              </div>
+              <div class="freeform-input-row">
+                <label data-i18n="freeform.abbrLabel">帯テキスト</label>
+                <input type="text" id="freeform-abbr-text" maxlength="4" placeholder="ABBR" data-i18n-placeholder="freeform.abbrPlaceholder" />
+                <span class="hint" data-i18n-hint="freeform.abbrHint">4文字まで</span>
+              </div>
+              <div class="freeform-input-actions">
+                <button type="button" class="ghost" id="freeform-cancel-btn" data-i18n="freeform.cancel">キャンセル</button>
+                <button type="button" class="primary" id="freeform-confirm-btn" data-i18n="freeform.confirm">追加</button>
+              </div>
+            </div>
+            <div class="freeform-add-controls" id="freeform-add-controls">
+              <button type="button" class="ghost freeform-add-btn" id="freeform-add-image">
+                <span class="freeform-add-icon">🖼️</span>
+                <span data-i18n="freeform.addImage">画像を追加</span>
+              </button>
+              <button type="button" class="ghost freeform-add-btn" id="freeform-add-text">
+                <span class="freeform-add-icon">Aa</span>
+                <span data-i18n="freeform.addText">テキストを追加</span>
+              </button>
+            </div>
+            <p class="hint" data-i18n-hint="freeform.hint">既存カテゴリに該当しないアイコンを自由に追加できます。</p>
+          </div>
         </div>
         <p class="hint" data-i18n-hint="palette.hint">カテゴリごとに1つを選択（ピッチは右で入力）。並び順は固定。</p>
       </div>
@@ -304,6 +338,7 @@
 
   <script type="module" src="main.js"></script>
   <input id="custom-icon-file" type="file" accept="image/*" hidden />
+  <input id="freeform-icon-file" type="file" accept="image/*" hidden />
 </body>
 
 </html>

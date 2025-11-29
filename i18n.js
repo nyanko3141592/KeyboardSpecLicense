@@ -35,6 +35,20 @@ export const translations = {
     'category.firmware': 'ファームウェア (Firmware)',
     'category.features': '拡張機能 (Features)',
     'category.battery': '電池形式 (Battery)',
+    'category.freeform': '自由アイコン (Freeform)',
+
+    // Freeform
+    'freeform.addImage': '画像を追加',
+    'freeform.addText': 'テキストを追加',
+    'freeform.hint': '既存カテゴリに該当しないアイコンを自由に追加できます。',
+    'freeform.iconLabel': 'アイコン内容',
+    'freeform.iconPlaceholder': 'TEXT',
+    'freeform.iconHint': '複数行可。画像の場合は自動設定。',
+    'freeform.abbrLabel': '帯テキスト',
+    'freeform.abbrPlaceholder': 'ABBR',
+    'freeform.abbrHint': '4文字まで',
+    'freeform.cancel': 'キャンセル',
+    'freeform.confirm': '追加',
 
     // アイコン説明
     'icon.shape-split.desc': '左右ユニットが分離し肩幅に合わせられるため、手首負担を減らしやすい。',
@@ -120,6 +134,20 @@ export const translations = {
     'category.firmware': 'Firmware',
     'category.features': 'Features',
     'category.battery': 'Battery',
+    'category.freeform': 'Freeform',
+
+    // Freeform
+    'freeform.addImage': 'Add Image',
+    'freeform.addText': 'Add Text',
+    'freeform.hint': 'Add custom icons that don\'t fit existing categories.',
+    'freeform.iconLabel': 'Icon Content',
+    'freeform.iconPlaceholder': 'TEXT',
+    'freeform.iconHint': 'Multi-line allowed. Auto-set for images.',
+    'freeform.abbrLabel': 'Badge Text',
+    'freeform.abbrPlaceholder': 'ABBR',
+    'freeform.abbrHint': 'Up to 4 characters',
+    'freeform.cancel': 'Cancel',
+    'freeform.confirm': 'Add',
 
     // Icon descriptions
     'icon.shape-split.desc': 'Left and right units are separated, allowing adjustment to shoulder width to reduce wrist strain.',
