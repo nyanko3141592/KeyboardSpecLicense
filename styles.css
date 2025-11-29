@@ -853,6 +853,92 @@ button.primary:disabled {
   background: var(--muted);
 }
 
+/* Multi-add list for pointing/features */
+.multi-add-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.multi-add-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--panel-secondary);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.multi-add-row .icon-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.multi-add-row .item-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.multi-add-row .item-count {
+  min-width: 24px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.multi-add-row .item-count:empty,
+.multi-add-row .item-count[data-count="0"] {
+  display: none;
+}
+
+.multi-add-row.has-count {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--panel-secondary));
+}
+
+.multi-add-list .ghost {
+  margin-top: 4px;
+}
+
+.count-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.count-btn:hover {
+  border-color: var(--accent);
+  background: var(--panel);
+}
+
+.count-btn:active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.count-btn.minus:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 .row {
   display: flex;
   align-items: center;

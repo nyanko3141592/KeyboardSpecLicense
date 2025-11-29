@@ -14,7 +14,7 @@ const state = {
   footerIsCustom: false,
 };
 
-const paletteButtons = Array.from(document.querySelectorAll('[data-icon-id]'));
+const paletteButtons = Array.from(document.querySelectorAll('button[data-icon-id]'));
 const palette = [
   // 1. 形状 (Shape)
   {
@@ -207,7 +207,6 @@ const iconOrder = palette.reduce((acc, item, idx) => {
   return acc;
 }, {});
 
-const selectedList = document.getElementById('selected-list');
 const svg = document.getElementById('badge-svg');
 const footerField = document.getElementById('footer-text');
 const mainImageFileInput = document.getElementById('main-image-file');
@@ -342,17 +341,43 @@ function findIcon(id) {
 function updatePaletteUI() {
   const selectedIds = new Set(state.selectedIcons.map((i) => i.id));
 
+  // pointing/featuresカテゴリの各アイコンのカウントを計算
+  const multiAddCounts = new Map();
+  state.selectedIcons.forEach((i) => {
+    if (i.category === 'pointing' || i.category === 'features') {
+      multiAddCounts.set(i.id, (multiAddCounts.get(i.id) || 0) + 1);
+    }
+  });
+
+  // 通常のパレットボタン（pointing/features以外）
   paletteButtons.forEach((btn) => {
     const icon = findIcon(btn.dataset.iconId);
     if (icon) {
       const buttonText = btn.querySelector('.button-text');
       if (buttonText) {
         buttonText.textContent = `${icon.label} · ${icon.abbr}`;
-      } else {
-        btn.textContent = `${icon.label} · ${icon.abbr}`;
       }
     }
     btn.classList.toggle('active', selectedIds.has(btn.dataset.iconId));
+  });
+
+  // multi-add-row（pointing/features）のカウント更新
+  document.querySelectorAll('.multi-add-row').forEach((row) => {
+    const iconId = row.dataset.iconId;
+    const count = multiAddCounts.get(iconId) || 0;
+    const countEl = row.querySelector('.item-count');
+    const minusBtn = row.querySelector('.count-btn.minus');
+
+    if (countEl) {
+      countEl.textContent = count > 0 ? count : '';
+      countEl.dataset.count = count;
+    }
+
+    row.classList.toggle('has-count', count > 0);
+
+    if (minusBtn) {
+      minusBtn.disabled = count === 0;
+    }
   });
 
   document.querySelectorAll('[data-custom-category]').forEach((btn) => {
@@ -366,10 +391,19 @@ function updatePaletteUI() {
     const selected = state.selectedIcons.filter((i) => i.category === cat);
     if (selected.length) {
       const lang = state.language || getCurrentLanguage();
-      descEl.innerHTML = selected
-        .map((s) => {
+      // pointing/featuresは同じアイコンをグループ化して表示
+      const grouped = new Map();
+      selected.forEach((s) => {
+        if (!grouped.has(s.id)) {
+          grouped.set(s.id, { icon: s, count: 0 });
+        }
+        grouped.get(s.id).count++;
+      });
+      descEl.innerHTML = Array.from(grouped.values())
+        .map(({ icon: s, count }) => {
           const desc = lang === 'ja' ? s.description_ja : s.description_en;
-          return `<div>${s.label} (${s.abbr}) — ${desc || ''}</div>`;
+          const countText = count > 1 ? ` ×${count}` : '';
+          return `<div>${s.label} (${s.abbr})${countText} — ${desc || ''}</div>`;
         })
         .join('');
     } else {
@@ -378,11 +412,14 @@ function updatePaletteUI() {
   });
 }
 
-function isSelected(id) {
-  return state.selectedIcons.some((i) => i.id === id);
-}
-
 function toggleIcon(icon) {
+  // pointing/featuresカテゴリは同じアイコンを複数追加可能（トラックボール2個など）
+  if (icon.category === 'pointing' || icon.category === 'features') {
+    // 常に追加（削除は別のUIで行う）
+    state.selectedIcons.push(icon);
+    return finalizeSelection();
+  }
+
   const existingIndex = state.selectedIcons.findIndex((i) => i.id === icon.id);
   if (existingIndex >= 0) {
     state.selectedIcons.splice(existingIndex, 1);
@@ -403,7 +440,6 @@ function toggleIcon(icon) {
 function finalizeSelection() {
   if (!state.footerIsCustom) state.footerText = buildFooterText();
   updatePaletteUI();
-  renderSelected();
   renderBadge();
   syncFooterField();
   saveStateToURL();
@@ -423,69 +459,9 @@ function setPitch() {
     state.selectedIcons.push(payload);
   }
   if (!state.footerIsCustom) state.footerText = buildFooterText();
-  renderSelected();
+  updatePaletteUI();
   renderBadge();
   syncFooterField();
-}
-
-function renderSelected() {
-  selectedList.innerHTML = '';
-  const ordered = getOrderedIcons();
-  ordered.forEach((icon) => {
-    const li = document.createElement('li');
-    const isNotSupported = state.notSupportedIcons.has(icon.id);
-    if (isNotSupported) li.classList.add('not-supported');
-
-    const info = document.createElement('div');
-    const desc = icon.description ? `<div class="desc">${icon.description}</div>` : '';
-    info.innerHTML = `<div class="label">${icon.label || 'Pitch'}</div><div class="meta">${icon.abbr} / ${icon.category}</div>${desc}`;
-
-    const actions = document.createElement('div');
-    actions.className = 'selected-actions';
-
-    const toggleNotSupported = document.createElement('button');
-    toggleNotSupported.className = `not-supported-btn${isNotSupported ? ' active' : ''}`;
-    toggleNotSupported.setAttribute('aria-label', t('selected.notSupported'));
-    toggleNotSupported.setAttribute('title', t('selected.notSupported'));
-    toggleNotSupported.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><line x1="3.5" y1="12.5" x2="12.5" y2="3.5" stroke="currentColor" stroke-width="1.5"/></svg>`;
-    toggleNotSupported.addEventListener('click', () => {
-      if (state.notSupportedIcons.has(icon.id)) {
-        state.notSupportedIcons.delete(icon.id);
-      } else {
-        state.notSupportedIcons.add(icon.id);
-      }
-      renderSelected();
-      renderBadge();
-      saveStateToURL();
-    });
-
-    const remove = document.createElement('button');
-    remove.textContent = '削除';
-    remove.addEventListener('click', () => {
-      const idx = state.selectedIcons.findIndex((i) => i.id === icon.id);
-      if (idx >= 0) state.selectedIcons.splice(idx, 1);
-      state.notSupportedIcons.delete(icon.id);
-      if (!state.footerIsCustom) state.footerText = buildFooterText();
-      renderSelected();
-      renderBadge();
-      updatePaletteUI();
-      syncFooterField();
-    });
-
-    actions.appendChild(toggleNotSupported);
-    actions.appendChild(remove);
-
-    li.appendChild(info);
-    li.appendChild(actions);
-    selectedList.appendChild(li);
-  });
-}
-
-// ordering helper
-function getOrderedIcons() {
-  return [...state.selectedIcons].sort(
-    (a, b) => categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category)
-  );
 }
 
 function getVisualSlots() {
@@ -493,11 +469,36 @@ function getVisualSlots() {
   categoryOrder.forEach((cat) => {
     const items = state.selectedIcons.filter((i) => i.category === cat);
     if (!items.length) return;
+
+    // pointing/featuresカテゴリは同じアイコンをグループ化してカウント、固定順序でソート
+    if (cat === 'pointing' || cat === 'features') {
+      const countMap = new Map();
+      items.forEach((item) => {
+        countMap.set(item.id, (countMap.get(item.id) || 0) + 1);
+      });
+      // ユニークなアイコンを取得し、iconOrderでソート
+      const uniqueItems = [];
+      const seen = new Set();
+      items.forEach((item) => {
+        if (!seen.has(item.id)) {
+          seen.add(item.id);
+          uniqueItems.push(item);
+        }
+      });
+      uniqueItems.sort((a, b) => (iconOrder[a.id] ?? 9999) - (iconOrder[b.id] ?? 9999));
+      uniqueItems.forEach((item) => {
+        slots.push({ category: cat, items: [item], count: countMap.get(item.id) });
+      });
+      return;
+    }
+
     const allowMulti = multiSelectCategories.has(cat);
     if (cat === 'pitch' || !allowMulti || items.length === 1) {
-      slots.push({ category: cat, items: [items[0]] });
+      slots.push({ category: cat, items: [items[0]], count: 1 });
     } else {
-      slots.push({ category: cat, items });
+      // 複数選択カテゴリ（connect, compat, firmware等）も固定順序でソート
+      const sortedItems = [...items].sort((a, b) => (iconOrder[a.id] ?? 9999) - (iconOrder[b.id] ?? 9999));
+      slots.push({ category: cat, items: sortedItems, count: 1 });
     }
   });
   return slots;
@@ -516,6 +517,27 @@ function renderIconOrText(item, cx, cy, innerR, clipId) {
     return `<text x="${cx}" y="${cy + 2}" text-anchor="middle" font-family="${'Space Grotesk'}" font-size="28" font-weight="700" fill="#000" dominant-baseline="middle" clip-path="url(#${clipId})">${label}</text>`;
   }
   return `<image href="${resolveIconHref(item.id)}" x="${cx - innerR}" y="${cy - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice" />`;
+}
+
+// Firmware用：複数選択時に上下分割でテキスト表示
+function renderFirmwareMulti(items, cx, cy, clipRoot) {
+  const count = items.length;
+  if (count === 1) {
+    const label = items[0].label || items[0].id.toUpperCase();
+    return `<text x="${cx}" y="${cy + 2}" text-anchor="middle" font-family="Space Grotesk" font-size="28" font-weight="700" fill="#000" dominant-baseline="middle">${label}</text>`;
+  }
+
+  // 上下に分割して表示
+  const fontSize = count <= 2 ? 20 : 16;
+  const lineHeight = fontSize + 4;
+  const totalHeight = count * lineHeight;
+  const startY = cy - totalHeight / 2 + lineHeight / 2;
+
+  return items.map((item, idx) => {
+    const label = item.label || item.id.toUpperCase();
+    const y = startY + idx * lineHeight;
+    return `<text x="${cx}" y="${y + 2}" text-anchor="middle" font-family="Space Grotesk" font-size="${fontSize}" font-weight="700" fill="#000" dominant-baseline="middle" clip-path="url(#${clipRoot})">${label}</text>`;
+  }).join('');
 }
 
 function setTheme(theme) {
@@ -749,7 +771,7 @@ function renderBadge() {
 
       const defs = isMulti
         ? itemsSorted
-          .map((item, segIdx) => {
+          .map((_, segIdx) => {
             const segCount = itemsSorted.length;
             const anglePer = (Math.PI * 2) / segCount;
             const start = -Math.PI / 2 + anglePer * segIdx;
@@ -760,29 +782,36 @@ function renderBadge() {
           .join('')
         : `<clipPath id="${clipRoot}"><circle cx="${cx}" cy="${attrRowY}" r="${innerR}" /></clipPath>`;
 
-      const images = isMulti
-        ? itemsSorted
-          .map((item, segIdx) => {
-            const id = `${clipRoot}-${segIdx}`;
-            return renderIconOrText(item, cx, attrRowY, innerR, id);
-          })
-          .join('')
-        : itemsSorted[0].id === 'pitch'
-          ? `<text class="mono" x="${cx}" y="${attrRowY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="28" font-weight="700" fill="${ink}" dominant-baseline="middle">${itemsSorted[0].value || itemsSorted[0].abbr}</text>`
-          : renderIconOrText(itemsSorted[0], cx, attrRowY, innerR, clipRoot);
+      // firmwareカテゴリは上下分割で表示
+      const isFirmware = slot.category === 'firmware';
+      const images = isFirmware
+        ? renderFirmwareMulti(itemsSorted, cx, attrRowY, clipRoot)
+        : isMulti
+          ? itemsSorted
+            .map((item, segIdx) => {
+              const id = `${clipRoot}-${segIdx}`;
+              return renderIconOrText(item, cx, attrRowY, innerR, id);
+            })
+            .join('')
+          : itemsSorted[0].id === 'pitch'
+            ? `<text class="mono" x="${cx}" y="${attrRowY}" text-anchor="middle" font-family="${'IBM Plex Mono'}" font-size="28" font-weight="700" fill="${ink}" dominant-baseline="middle">${itemsSorted[0].value || itemsSorted[0].abbr}</text>`
+            : renderIconOrText(itemsSorted[0], cx, attrRowY, innerR, clipRoot);
 
-      const spokes = isMulti
-        ? itemsSorted
-          .map((_, segIdx) => {
-            const segCount = itemsSorted.length;
-            const anglePer = (Math.PI * 2) / segCount;
-            const angle = -Math.PI / 2 + anglePer * segIdx;
-            const x = cx + innerR * Math.cos(angle);
-            const y = attrRowY + innerR * Math.sin(angle);
-            return `<line x1="${cx}" y1="${attrRowY}" x2="${x}" y2="${y}" stroke="${ink}" stroke-width="1" />`;
-          })
-          .join('')
-        : '';
+      // firmwareカテゴリはspokesなし
+      const spokes = isFirmware
+        ? ''
+        : isMulti
+          ? itemsSorted
+            .map((_, segIdx) => {
+              const segCount = itemsSorted.length;
+              const anglePer = (Math.PI * 2) / segCount;
+              const angle = -Math.PI / 2 + anglePer * segIdx;
+              const x = cx + innerR * Math.cos(angle);
+              const y = attrRowY + innerR * Math.sin(angle);
+              return `<line x1="${cx}" y1="${attrRowY}" x2="${x}" y2="${y}" stroke="${ink}" stroke-width="1" />`;
+            })
+            .join('')
+          : '';
 
       // Check if any icon in the slot is marked as not supported
       const hasNotSupported = slot.items.some(item => state.notSupportedIcons.has(item.id));
@@ -807,7 +836,12 @@ function renderBadge() {
 
   const footerPieces = slots.map((slot) => {
     if (slot.category === 'firmware') return ['FW'];
-    return slot.items.map((i) => formatAbbr(i.abbr)).filter(Boolean);
+    const abbrs = slot.items.map((i) => formatAbbr(i.abbr)).filter(Boolean);
+    // カウントが2以上の場合は「TB×2」のように表示
+    if (slot.count && slot.count > 1) {
+      return abbrs.map(abbr => `${abbr}×${slot.count}`);
+    }
+    return abbrs;
   });
 
   const svgMarkup = `
@@ -1015,6 +1049,41 @@ function wireUI() {
     });
   });
 
+  // multi-add-row（pointing/features）の+/−ボタン
+  document.querySelectorAll('.multi-add-row').forEach((row) => {
+    const iconId = row.dataset.iconId;
+    const icon = findIcon(iconId);
+    if (!icon) return;
+
+    const minusBtn = row.querySelector('.count-btn.minus');
+    const plusBtn = row.querySelector('.count-btn.plus');
+
+    if (minusBtn) {
+      minusBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (minusBtn.disabled) return;
+        const idx = state.selectedIcons.findIndex((i) => i.id === iconId);
+        if (idx >= 0) {
+          state.selectedIcons.splice(idx, 1);
+          if (!state.selectedIcons.some(i => i.id === iconId)) {
+            state.notSupportedIcons.delete(iconId);
+          }
+          finalizeSelection();
+        }
+      });
+    }
+
+    if (plusBtn) {
+      plusBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        state.selectedIcons.push(icon);
+        finalizeSelection();
+      });
+    }
+  });
+
   document.querySelectorAll('[data-custom-category]').forEach((btn) => {
     btn.addEventListener('click', () => startCustomIcon(btn.dataset.customCategory));
   });
@@ -1063,11 +1132,26 @@ function wireUI() {
 }
 
 function loadIconPreviews() {
+  // 通常のパレットボタン
   paletteButtons.forEach((btn) => {
     const iconId = btn.dataset.iconId;
     if (!iconId) return;
 
     const iconPreview = btn.querySelector('.icon-preview');
+    if (!iconPreview) return;
+
+    const filename = iconFileMap[iconId] || `${iconId}.png`;
+    const iconUrl = iconDataUrlCache[filename] || `./public/${filename}`;
+
+    iconPreview.style.backgroundImage = `url(${iconUrl})`;
+  });
+
+  // multi-add-row（pointing/features）
+  document.querySelectorAll('.multi-add-row').forEach((row) => {
+    const iconId = row.dataset.iconId;
+    if (!iconId) return;
+
+    const iconPreview = row.querySelector('.icon-preview');
     if (!iconPreview) return;
 
     const filename = iconFileMap[iconId] || `${iconId}.png`;
@@ -1093,7 +1177,6 @@ function init() {
   window.addEventListener('languagechange', (e) => {
     state.language = e.detail.lang;
     updatePaletteUI();
-    renderSelected();
   });
 
   preloadIcons().then(() => {
@@ -1110,7 +1193,6 @@ function init() {
   }
 
   updatePaletteUI();
-  renderSelected();
   renderBadge();
   syncFooterField();
   wireUI();
