@@ -11,7 +11,8 @@
 
 ## 画像差し替え
 - ベース画像は `public/*.png`。IDとファイル名の対応は `main.js` の `iconFileMap` を参照。
-- 例: `compat-mx` → `fram25_tiles/mx.png`, `feature-ec` → `fram25_tiles/encoder.png`, `feature-dp` → `fram25_tiles/display.png`, `firmware-qmk` → `fram25_tiles/qmk.png`, `firmware-zmk` → `fram25_tiles/zmk.png`, `battery-aaa` → `fram25_tiles/battery.png`, `battery-lipo` → `fram25_tiles/lipo.png`
+- 例: `feature-ec` → `fram25_tiles/encoder.png`, `feature-dp` → `fram25_tiles/display.png`, `battery-aaa` → `fram25_tiles/battery.png`, `battery-lipo` → `fram25_tiles/lipo.png`
+- **テキスト表示カテゴリ**: ファームウェア（QMK/ZMK）および互換性（MX/V1/V2）は画像ではなくテキストで表示。
 - カスタムアイコンはアップロードのみ（URL指定なし）。アップロード後に略称入力ダイアログが出る。
 - リセットは同カテゴリ内で別アイコンを選択するか、再読み込みで初期状態に戻せます。
 
