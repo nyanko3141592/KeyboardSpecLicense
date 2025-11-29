@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Icon Reference - KeySpec Generator</title>
+  <meta property="og:title" content="Icon Reference - KeySpec Generator" />
+  <meta property="og:description" content="KeySpecバッジで使用するアイコンの意味一覧" />
+  <link rel="icon" href="favicon.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .icon-ref-header {
+      max-width: 900px;
+      margin: 0 auto 32px;
+      text-align: center;
+    }
+
+    .icon-ref-header h1 {
+      font-size: 1.75rem;
+      margin: 0 0 8px;
+    }
+
+    .icon-ref-header p {
+      color: var(--muted);
+      margin: 0 0 16px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .icon-ref-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .icon-category {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .icon-category h2 {
+      font-size: 1.1rem;
+      margin: 0 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    .icon-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .icon-item {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .icon-image {
+      width: 64px;
+      height: 64px;
+      background: var(--panel-secondary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    .icon-image img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .icon-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .icon-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .icon-label {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--ink);
+    }
+
+    .icon-abbr {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    body.dark .icon-abbr {
+      background: var(--accent-ultra-light);
+    }
+
+    .icon-desc {
+      font-size: 0.9rem;
+      color: var(--ink-secondary);
+      line-height: 1.5;
+    }
+
+    .icon-desc-en {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 2px;
+    }
+
+    .header-buttons {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .theme-toggle-fixed {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--line);
+      background: var(--panel);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: var(--shadow-sm);
+      transition: background 200ms, border-color 200ms;
+    }
+
+    .theme-toggle-fixed:hover {
+      background: var(--panel-secondary);
+      border-color: var(--line-strong);
+    }
+
+    @media (max-width: 600px) {
+      .icon-item {
+        grid-template-columns: 48px 1fr;
+        gap: 12px;
+      }
+
+      .icon-image {
+        width: 48px;
+        height: 48px;
+        padding: 6px;
+      }
+
+      .icon-category {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header-buttons">
+    <button class="theme-toggle-fixed" id="theme-toggle-btn" aria-label="テーマ切り替え">
+      <span class="theme-icon">☀️</span>
+    </button>
+  </div>
+
+  <header class="icon-ref-header">
+    <a href="index.html" class="back-link">← KeySpec Generator に戻る</a>
+    <h1>Icon Reference</h1>
+    <p>KeySpecバッジで使用するアイコンの意味一覧</p>
+  </header>
+
+  <main class="icon-ref-container">
+    <!-- Shape -->
+    <section class="icon-category">
+      <h2>形状 (Shape)</h2>
+      <div class="icon-list">
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/split.png" alt="Split icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Split</span>
+              <span class="icon-abbr">SP</span>
+            </div>
+            <p class="icon-desc">左右ユニットが分離し肩幅に合わせられるため、手首負担を減らしやすい。</p>
+            <p class="icon-desc-en">Left and right units are separated, allowing adjustment to shoulder width to reduce wrist strain.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/unit.png" alt="Unibody icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Unibody</span>
+              <span class="icon-abbr">UB</span>
+            </div>
+            <p class="icon-desc">一枚板の筐体で取り回しが良く、剛性や打鍵音を安定させやすい。</p>
+            <p class="icon-desc-en">Single-piece case for easy handling, stable rigidity and typing sound.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/macro.png" alt="MacroPad icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">MacroPad</span>
+              <span class="icon-abbr">MP</span>
+            </div>
+            <p class="icon-desc">テンキー/ファンクションなど補助用途に特化した小型キーボード。</p>
+            <p class="icon-desc-en">Small keyboard specialized for auxiliary purposes like numpad/function keys.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Layout -->
+    <section class="icon-category">
+      <h2>配列 (Layout)</h2>
+      <div class="icon-list">
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/row-sta.png" alt="Row-staggered icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Row-staggered</span>
+              <span class="icon-abbr">RS</span>
+            </div>
+            <p class="icon-desc">横方向に段差をつけた一般的配列。通常キーボードから移行しやすい。</p>
+            <p class="icon-desc-en">Common layout with horizontal offset. Easy transition from standard keyboards.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/col-sta.png" alt="Column-staggered icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Column-staggered</span>
+              <span class="icon-abbr">CS</span>
+            </div>
+            <p class="icon-desc">縦方向に段差をつけ指の長さに合わせた配列で、移動量を減らしやすい。</p>
+            <p class="icon-desc-en">Vertical offset matching finger lengths, reducing finger travel distance.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/ortho.png" alt="Ortholinear icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Ortholinear</span>
+              <span class="icon-abbr">OR</span>
+            </div>
+            <p class="icon-desc">キーが格子状に縦横まっすぐ並ぶ配列。</p>
+            <p class="icon-desc-en">Keys arranged in a straight grid pattern both vertically and horizontally.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/alice.png" alt="Alice / Arisu icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Alice / Arisu</span>
+              <span class="icon-abbr">AL</span>
+            </div>
+            <p class="icon-desc">一体型で中央が開いたハの字配列。自然な手首角度を取りやすい。</p>
+            <p class="icon-desc-en">Unified layout with open center in V-shape. Easier to maintain natural wrist angle.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/grin.png" alt="GRIN icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">GRIN</span>
+              <span class="icon-abbr">GR</span>
+            </div>
+            <p class="icon-desc">エルゴ性を重視した独自特殊配列。</p>
+            <p class="icon-desc-en">Unique special layout focusing on ergonomics.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Connect -->
+    <section class="icon-category">
+      <h2>接続 (Connect)</h2>
+      <div class="icon-list">
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/wired.png" alt="Wired icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Wired</span>
+              <span class="icon-abbr">WR</span>
+            </div>
+            <p class="icon-desc">USBなど有線で接続し、電源・通信が安定。</p>
+            <p class="icon-desc-en">Wired connection via USB etc., providing stable power and communication.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/wireless.png" alt="Wireless icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Wireless</span>
+              <span class="icon-abbr">WL</span>
+            </div>
+            <p class="icon-desc">Bluetooth/2.4GHzなど完全無線。ケーブルレス運用。</p>
+            <p class="icon-desc-en">Fully wireless via Bluetooth/2.4GHz. Cable-free operation.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/halifWireless.png" alt="HalfWired icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">HalfWired</span>
+              <span class="icon-abbr">HW</span>
+            </div>
+            <p class="icon-desc">PCとの通信は無線だが、それ以外の場所でケーブル接続が必要。主にBluetooth接続の分割キーボードで採用される構成。</p>
+            <p class="icon-desc-en">Wireless connection to PC, but requires cable elsewhere. Commonly used in Bluetooth split keyboards.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Compatibility -->
+    <section class="icon-category">
+      <h2>互換性 (Switch / Keycap)</h2>
+      <div class="icon-list">
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/mx.png" alt="Cherry MX icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Cherry MX</span>
+              <span class="icon-abbr">MX</span>
+            </div>
+            <p class="icon-desc">十字軸。一般的なMX規格キーキャップと互換性がある。</p>
+            <p class="icon-desc-en">Cross-stem. Compatible with standard MX keycaps.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/chocv1.png" alt="Kailh Choc v1 icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Kailh Choc v1</span>
+              <span class="icon-abbr">C1</span>
+            </div>
+            <p class="icon-desc">薄型Choc v1専用。MXやChoc v2とは非互換のロープロ仕様。</p>
+            <p class="icon-desc-en">Low-profile Choc v1 exclusive. Incompatible with MX and Choc v2.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/chocv2.png" alt="Kailh Choc v2 icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Kailh Choc v2</span>
+              <span class="icon-abbr">C2</span>
+            </div>
+            <p class="icon-desc">Choc v2専用キーキャップと互換。v1/MXとは非互換。</p>
+            <p class="icon-desc-en">Compatible with Choc v2 keycaps. Incompatible with v1/MX.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pointing -->
+    <section class="icon-category">
+      <h2>ポインティング (Pointing)</h2>
+      <div class="icon-list">
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/trackball.png" alt="Trackball icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Trackball</span>
+              <span class="icon-abbr">TB</span>
+            </div>
+            <p class="icon-desc">親指や指先でボールを回しホームポジションからカーソル操作。</p>
+            <p class="icon-desc-en">Roll ball with thumb or fingertip for cursor control from home position.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/trackpoint.png" alt="TrackPoint icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">TrackPoint</span>
+              <span class="icon-abbr">TP</span>
+            </div>
+            <p class="icon-desc">キー間のスティックで小さな力でも精密にカーソル操作できる。</p>
+            <p class="icon-desc-en">Stick between keys allows precise cursor control with minimal force.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/trackpad.png" alt="Trackpad icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Trackpad</span>
+              <span class="icon-abbr">TD</span>
+            </div>
+            <p class="icon-desc">指でなぞりカーソル移動やジェスチャー操作が可能。</p>
+            <p class="icon-desc-en">Swipe finger for cursor movement and gesture operations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Firmware -->
+    <section class="icon-category">
+      <h2>ファームウェア (Firmware)</h2>
+      <div class="icon-list">
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/qmk.png" alt="QMK icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">QMK</span>
+              <span class="icon-abbr">FW</span>
+            </div>
+            <p class="icon-desc">有線で広く使われる多機能OSSファームウェア。</p>
+            <p class="icon-desc-en">Feature-rich OSS firmware widely used for wired keyboards.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/zmk.png" alt="ZMK icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">ZMK</span>
+              <span class="icon-abbr">FW</span>
+            </div>
+            <p class="icon-desc">無線や省電力構成に適したモダンOSSファームウェア。</p>
+            <p class="icon-desc-en">Modern OSS firmware suitable for wireless and low-power configurations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="icon-category">
+      <h2>拡張機能 (Features)</h2>
+      <div class="icon-list">
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/encoder.png" alt="Encoder icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Encoder</span>
+              <span class="icon-abbr">EC</span>
+            </div>
+            <p class="icon-desc">回転ノブで音量/スクロール/レイヤー切替などに割り当て可能。</p>
+            <p class="icon-desc-en">Rotary knob assignable to volume/scroll/layer switching etc.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/display.png" alt="Display icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Display</span>
+              <span class="icon-abbr">DP</span>
+            </div>
+            <p class="icon-desc">OLED/電子ペーパー等でレイヤー・バッテリー・ロゴを表示。</p>
+            <p class="icon-desc-en">Display layer/battery/logo on OLED/e-paper etc.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Battery -->
+    <section class="icon-category">
+      <h2>電池形式 (Battery)</h2>
+      <div class="icon-list">
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/battery.png" alt="AAA Battery icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">AAA</span>
+              <span class="icon-abbr">BT</span>
+            </div>
+            <p class="icon-desc">単4電池で駆動。入手しやすく交換も容易。</p>
+            <p class="icon-desc-en">Powered by AAA batteries. Easy to obtain and replace.</p>
+          </div>
+        </div>
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/lipo.png" alt="LiPo Battery icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">LiPo</span>
+              <span class="icon-abbr">BT</span>
+            </div>
+            <p class="icon-desc">リチウムポリマー電池で駆動。薄型軽量で充電可能。</p>
+            <p class="icon-desc-en">Powered by LiPo battery. Thin, lightweight, and rechargeable.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Module Marker -->
+    <section class="icon-category">
+      <h2>モジュール (Module)</h2>
+      <div class="icon-list">
+        <div class="icon-item">
+          <div class="icon-image">
+            <img src="public/fram25_tiles/module.png" alt="Module marker icon" />
+          </div>
+          <div class="icon-info">
+            <div class="icon-title">
+              <span class="icon-label">Module Marker</span>
+            </div>
+            <p class="icon-desc">アイコンがモジュール（着脱可能なオプション）であることを示すマーカー。ポインティングデバイスや拡張機能で使用。</p>
+            <p class="icon-desc-en">Marker indicating the icon is a module (detachable option). Used with pointing devices and features.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Theme toggle
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const themeIcon = themeBtn.querySelector('.theme-icon');
+
+    function setTheme(isDark) {
+      document.body.classList.toggle('dark', isDark);
+      themeIcon.textContent = isDark ? '🌙' : '☀️';
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    // Initialize theme
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(savedTheme === 'dark' || (!savedTheme && prefersDark));
+
+    themeBtn.addEventListener('click', () => {
+      setTheme(!document.body.classList.contains('dark'));
+    });
+  </script>
+</body>
+
+</html>

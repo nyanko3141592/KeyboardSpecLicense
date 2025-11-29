@@ -48,6 +48,9 @@
 #### カスタムアイコンのアップロード
 各カテゴリで「カスタム画像」ボタンをクリックして独自のアイコンをアップロードできます。
 
+#### モジュールマーク
+ポインティングデバイスや拡張機能が取り外し可能（モジュール式）の場合、パズルピースアイコンをクリックしてモジュールマークを表示できます。マークはアイコンの右下に表示されます。
+
 #### URL共有
 1. バッジをカスタマイズ
 2. 「URLで共有」ボタンをクリック
@@ -133,6 +136,7 @@ npx http-server
 | `footer` | カスタムフッターテキスト | `footer=My%20Custom%20Footer` |
 | `batteryText` | 電池アイコン内のテキスト | `batteryText=AA` |
 | `notSupported` | 非対応アイコンID（カンマ区切り） | `notSupported=connect-wl` |
+| `module` | モジュール（取り外し可能）アイコンID（カンマ区切り） | `module=pointing-tb,feature-ec` |
 
 **利用可能なアイコンID:**
 - 形状: `shape-split`, `shape-unibody`, `shape-macropad`
