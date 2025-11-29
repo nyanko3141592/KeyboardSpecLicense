@@ -10,8 +10,10 @@ const state = {
   customIconMap: {},
   selectedIcons: [],
   notSupportedIcons: new Set(),
+  moduleIcons: new Set(),
   footerText: '',
   footerIsCustom: false,
+  batteryText: 'AAA',
 };
 
 const paletteButtons = Array.from(document.querySelectorAll('button[data-icon-id]'));
@@ -199,6 +201,25 @@ const palette = [
     description_ja: 'OLED/電子ペーパー等でレイヤー・バッテリー・ロゴを表示。',
     description_en: 'Display layer/battery/logo on OLED/e-paper etc.',
   },
+
+  // 9. 電池形式 (Battery)
+  {
+    id: 'battery-aaa',
+    category: 'battery',
+    label: 'AAA',
+    abbr: 'BT',
+    batteryText: 'AAA',
+    description_ja: '単4電池で駆動。入手しやすく交換も容易。',
+    description_en: 'Powered by AAA batteries. Easy to obtain and replace.',
+  },
+  {
+    id: 'battery-lipo',
+    category: 'battery',
+    label: 'LiPo',
+    abbr: 'BT',
+    description_ja: 'リチウムポリマー電池で駆動。薄型軽量で充電可能。',
+    description_en: 'Powered by LiPo battery. Thin, lightweight, and rechargeable.',
+  },
 ];
 
 // 固定順序でアイコンを並べるためのインデックスマップ
@@ -240,6 +261,11 @@ const iconFileMap = {
   // Features
   'feature-ec': 'fram25_tiles/encoder.png',
   'feature-dp': 'fram25_tiles/display.png',
+  // Battery
+  'battery-aaa': 'fram25_tiles/battery.png',
+  'battery-lipo': 'fram25_tiles/lipo.png',
+  // Module marker
+  'module-mark': 'fram25_tiles/module.png',
 };
 const iconDataUrlCache = {};
 let iconPreloadPromise = null;
@@ -286,6 +312,7 @@ const categoryOrder = [
   'pointing',
   'firmware',
   'features',
+  'battery',
 ];
 const multiSelectCategories = new Set(['connect', 'compat', 'pointing', 'firmware', 'features']);
 
@@ -410,6 +437,26 @@ function updatePaletteUI() {
       descEl.textContent = t('palette.unselected');
     }
   });
+
+  // battery-aaaが選択されている場合のみテキスト入力UIを表示
+  const batteryTextInput = document.querySelector('.battery-text-input');
+  if (batteryTextInput) {
+    const hasBatteryAaa = state.selectedIcons.some((i) => i.id === 'battery-aaa');
+    batteryTextInput.style.display = hasBatteryAaa ? 'block' : 'none';
+  }
+
+  // モジュールボタンのUI更新
+  updateModuleButtonUI();
+}
+
+function updateModuleButtonUI() {
+  document.querySelectorAll('.multi-add-row').forEach((row) => {
+    const iconId = row.dataset.iconId;
+    const moduleBtn = row.querySelector('.module-btn');
+    if (moduleBtn) {
+      moduleBtn.classList.toggle('active', state.moduleIcons.has(iconId));
+    }
+  });
 }
 
 function toggleIcon(icon) {
@@ -448,10 +495,9 @@ function finalizeSelection() {
 function setPitch() {
   const value = document.getElementById('pitch-input').value.trim();
   const abbr = document.getElementById('pitch-abbr').value.trim() || 'KP';
-  if (!value) return;
-  state.pitchValue = value;
+  state.pitchValue = value || '';
   state.pitchAbbr = abbr;
-  const payload = { id: 'pitch', category: 'pitch', label: 'Pitch', abbr, value };
+  const payload = { id: 'pitch', category: 'pitch', label: 'Pitch', abbr, value: value || '' };
   const existingIndex = state.selectedIcons.findIndex((i) => i.category === 'pitch');
   if (existingIndex >= 0) {
     state.selectedIcons.splice(existingIndex, 1, payload);
@@ -462,6 +508,7 @@ function setPitch() {
   updatePaletteUI();
   renderBadge();
   syncFooterField();
+  saveStateToURL();
 }
 
 function getVisualSlots() {
@@ -515,6 +562,17 @@ function renderIconOrText(item, cx, cy, innerR, clipId) {
   if (item.category === 'firmware') {
     const label = item.label || item.id.toUpperCase();
     return `<text x="${cx}" y="${cy + 2}" text-anchor="middle" font-family="${'Space Grotesk'}" font-size="28" font-weight="700" fill="#000" dominant-baseline="middle" clip-path="url(#${clipId})">${label}</text>`;
+  }
+  // Batteryカテゴリは画像を表示（battery-aaaの場合のみテキストを重ねる）
+  if (item.category === 'battery') {
+    const imgMarkup = `<image href="${resolveIconHref(item.id)}" x="${cx - innerR}" y="${cy - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice" />`;
+    // battery-aaaの場合のみテキストを重ねる（lipoは画像のみ）
+    if (item.id === 'battery-aaa') {
+      const batteryText = state.batteryText || 'AAA';
+      const textMarkup = `<text x="${cx}" y="${cy + 2}" text-anchor="middle" font-family="IBM Plex Mono" font-size="18" font-weight="700" fill="#000" dominant-baseline="middle" clip-path="url(#${clipId})">${batteryText}</text>`;
+      return imgMarkup + textMarkup;
+    }
+    return imgMarkup;
   }
   return `<image href="${resolveIconHref(item.id)}" x="${cx - innerR}" y="${cy - innerR}" width="${innerR * 2}" height="${innerR * 2}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice" />`;
 }
@@ -599,9 +657,20 @@ function saveStateToURL() {
     params.set('notSupported', notSupportedIds);
   }
 
+  // モジュールアイコン
+  const moduleIds = Array.from(state.moduleIcons).join(',');
+  if (moduleIds) {
+    params.set('module', moduleIds);
+  }
+
   // フッターテキスト（カスタムの場合のみ）
   if (state.footerIsCustom && state.footerText) {
     params.set('footer', state.footerText);
+  }
+
+  // 電池テキスト
+  if (state.batteryText && state.batteryText !== 'AAA') {
+    params.set('batteryText', state.batteryText);
   }
 
   // URLを更新（リロードなし）
@@ -662,6 +731,13 @@ function loadStateFromURL() {
     state.notSupportedIcons = new Set(notSupportedIds);
   }
 
+  // モジュールアイコン
+  const moduleParam = params.get('module');
+  if (moduleParam) {
+    const moduleIds = moduleParam.split(',').filter(Boolean);
+    state.moduleIcons = new Set(moduleIds);
+  }
+
   // フッター
   const footer = params.get('footer');
   if (footer) {
@@ -670,6 +746,16 @@ function loadStateFromURL() {
   } else {
     state.footerText = buildFooterText();
     state.footerIsCustom = false;
+  }
+
+  // 電池テキスト
+  const batteryText = params.get('batteryText');
+  if (batteryText) {
+    state.batteryText = batteryText;
+    const batteryTextEl = document.getElementById('battery-text');
+    if (batteryTextEl) {
+      batteryTextEl.value = batteryText;
+    }
   }
 
   return params.toString().length > 0;
@@ -822,6 +908,18 @@ function renderBadge() {
         ? `<line x1="${cx - strikeOffset}" y1="${attrRowY + strikeOffset}" x2="${cx + strikeOffset}" y2="${attrRowY - strikeOffset}" stroke="${ink}" stroke-width="${attrStroke}" stroke-linecap="round" />`
         : '';
 
+      // Check if any icon in the slot is marked as module
+      const hasModule = slot.items.some(item => state.moduleIcons.has(item.id));
+      // Draw module mark at bottom-right corner, slightly overlapping the circle (1/3 of icon size)
+      const moduleSize = Math.round(attrRadius * 2 / 3); // 約30px (アイコン直径の1/3)
+      // 円と少し被るように配置（moduleSize/3 分だけ内側に）
+      const moduleX = cx + attrRadius - moduleSize * 2 / 3;
+      const moduleY = attrRowY + attrRadius - moduleSize * 2 / 3;
+      const moduleMarkHref = resolveIconHref('module-mark');
+      const moduleMark = hasModule
+        ? `<image href="${moduleMarkHref}" x="${moduleX}" y="${moduleY}" width="${moduleSize}" height="${moduleSize}" />`
+        : '';
+
       return `
         <g aria-label="${slot.items.map((s) => s.label).join(' / ')}">
           <defs>${defs}</defs>
@@ -829,6 +927,7 @@ function renderBadge() {
           ${images}
           ${spokes}
           ${strikethrough}
+          ${moduleMark}
         </g>
       `;
     })
@@ -1082,6 +1181,22 @@ function wireUI() {
         finalizeSelection();
       });
     }
+
+    const moduleBtn = row.querySelector('.module-btn');
+    if (moduleBtn) {
+      moduleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (state.moduleIcons.has(iconId)) {
+          state.moduleIcons.delete(iconId);
+        } else {
+          state.moduleIcons.add(iconId);
+        }
+        updateModuleButtonUI();
+        renderBadge();
+        saveStateToURL();
+      });
+    }
   });
 
   document.querySelectorAll('[data-custom-category]').forEach((btn) => {
@@ -1092,10 +1207,22 @@ function wireUI() {
     btn.addEventListener('click', () => setTheme(btn.dataset.theme));
   });
 
-  document.getElementById('set-pitch').addEventListener('click', setPitch);
+  // キーピッチ入力を即時反映
+  document.getElementById('pitch-input').addEventListener('input', setPitch);
+  document.getElementById('pitch-abbr').addEventListener('input', setPitch);
 
   footerField.addEventListener('input', (e) => handleFooterChange(e.target.value));
   document.getElementById('reset-footer').addEventListener('click', resetFooter);
+
+  // 電池テキスト入力
+  const batteryTextEl = document.getElementById('battery-text');
+  if (batteryTextEl) {
+    batteryTextEl.addEventListener('input', (e) => {
+      state.batteryText = e.target.value || 'AAA';
+      renderBadge();
+      saveStateToURL();
+    });
+  }
 
   // 共有ボタン
   const shareBtn = document.getElementById('share-url-btn');

@@ -10,10 +10,14 @@
 - **テーマ**: ライト / ダーク。
 
 ## 画像差し替え
-- ベース画像は `public/*.png`。IDとファイル名の対応は `main.js` の `iconFileMap` を参照。  
-- 例: `compat-mx` → `fram25_tiles/mx.png`, `feature-ec` → `fram25_tiles/encoder.png`, `feature-dp` → `fram25_tiles/display.png`, `firmware-qmk` → `fram25_tiles/qmk.png`, `firmware-zmk` → `fram25_tiles/zmk.png`
-- カスタムアイコンはアップロードのみ（URL指定なし）。アップロード後に略称入力ダイアログが出る。  
+- ベース画像は `public/*.png`。IDとファイル名の対応は `main.js` の `iconFileMap` を参照。
+- 例: `compat-mx` → `fram25_tiles/mx.png`, `feature-ec` → `fram25_tiles/encoder.png`, `feature-dp` → `fram25_tiles/display.png`, `firmware-qmk` → `fram25_tiles/qmk.png`, `firmware-zmk` → `fram25_tiles/zmk.png`, `battery-aaa` → `fram25_tiles/battery.png`, `battery-lipo` → `fram25_tiles/lipo.png`
+- カスタムアイコンはアップロードのみ（URL指定なし）。アップロード後に略称入力ダイアログが出る。
 - リセットは同カテゴリ内で別アイコンを選択するか、再読み込みで初期状態に戻せます。
+
+## 電池形式
+- **AAA（乾電池）**: アイコン上に任意のテキストを表示可能（デフォルト: AAA）。入力フィールドで変更可。
+- **LiPo（リポバッテリー）**: アイコンのみ表示（テキストなし）。
 
 ## ファイル構成
 - `index.html` … UI 本体（ファイル入力は画面最下部の hidden input）  

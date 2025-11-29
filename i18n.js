@@ -34,6 +34,7 @@ export const translations = {
     'category.pointing': 'ポインティング (Pointing)',
     'category.firmware': 'ファームウェア (Firmware)',
     'category.features': '拡張機能 (Features)',
+    'category.battery': '電池形式 (Battery)',
 
     // アイコン説明
     'icon.shape-split.desc': '左右ユニットが分離し肩幅に合わせられるため、手首負担を減らしやすい。',
@@ -57,10 +58,16 @@ export const translations = {
     'icon.firmware-zmk.desc': '無線や省電力構成に適したモダンOSSファームウェア。',
     'icon.feature-ec.desc': '回転ノブで音量/スクロール/レイヤー切替などに割り当て可能。',
     'icon.feature-dp.desc': 'OLED/電子ペーパー等でレイヤー・バッテリー・ロゴを表示。',
+    'icon.battery-aaa.desc': '単4電池で駆動。入手しやすく交換も容易。',
+    'icon.battery-lipo.desc': 'リチウムポリマー電池で駆動。薄型軽量で充電可能。',
+    'battery.textHint': '電池アイコン内に表示するテキスト',
 
     // 選択済みアイコン
     'selected.label': '選択済みアイコン',
     'selected.notSupported': '非対応',
+
+    // モジュール
+    'module.toggle': 'モジュール（取り外し可能）',
 
     // フッター
     'footer.label': '下部帯テキスト',
@@ -112,6 +119,7 @@ export const translations = {
     'category.pointing': 'Pointing Device',
     'category.firmware': 'Firmware',
     'category.features': 'Features',
+    'category.battery': 'Battery',
 
     // Icon descriptions
     'icon.shape-split.desc': 'Left and right units are separated, allowing adjustment to shoulder width to reduce wrist strain.',
@@ -135,10 +143,16 @@ export const translations = {
     'icon.firmware-zmk.desc': 'Modern OSS firmware suitable for wireless and low-power configurations.',
     'icon.feature-ec.desc': 'Rotary knob assignable to volume/scroll/layer switching etc.',
     'icon.feature-dp.desc': 'Display layer/battery/logo on OLED/e-paper etc.',
+    'icon.battery-aaa.desc': 'Powered by AAA batteries. Easy to obtain and replace.',
+    'icon.battery-lipo.desc': 'Powered by LiPo battery. Thin, lightweight, and rechargeable.',
+    'battery.textHint': 'Text to display on battery icon',
 
     // Selected icons
     'selected.label': 'Selected Icons',
     'selected.notSupported': 'Not Supported',
+
+    // Module
+    'module.toggle': 'Module (Removable)',
 
     // Footer
     'footer.label': 'Footer Text',
@@ -220,6 +234,14 @@ function updateUI(lang) {
     const key = el.getAttribute('data-i18n-hint');
     if (t[key]) {
       el.textContent = t[key];
+    }
+  });
+
+  // data-i18n-title属性を持つ要素のtitleを更新
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    if (t[key]) {
+      el.setAttribute('title', t[key]);
     }
   });
 }

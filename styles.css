@@ -939,6 +939,38 @@ button.primary:disabled {
   cursor: not-allowed;
 }
 
+.module-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  border: 1.5px solid var(--line);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 200ms ease;
+  margin-left: 4px;
+}
+
+.module-btn:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.module-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.module-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 .row {
   display: flex;
   align-items: center;

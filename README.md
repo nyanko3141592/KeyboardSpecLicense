@@ -33,8 +33,9 @@
      - **接続**: Wired / Wireless / HalfWired
      - **互換性**: Cherry MX / Kailh Choc v1 / Kailh Choc v2
      - **ポインティング**: Trackball / TrackPoint / Trackpad
-     - **ファームウェア**: QMK / ZMK / VIA / VIAL
+     - **ファームウェア**: QMK / ZMK
      - **拡張機能**: Encoder / Display
+     - **電池形式**: AAA（乾電池） / LiPo（リポバッテリー）
 
 4. **フッターテキストをカスタマイズ**
    - 自動生成されたテキストをそのまま使用、または手動で編集
@@ -130,6 +131,8 @@ npx http-server
 | `pitchAbbr` | ピッチ略称 | `pitchAbbr=KP` |
 | `icons` | 選択されたアイコンID（カンマ区切り） | `icons=shape-split,stagger-column` |
 | `footer` | カスタムフッターテキスト | `footer=My%20Custom%20Footer` |
+| `batteryText` | 電池アイコン内のテキスト | `batteryText=AA` |
+| `notSupported` | 非対応アイコンID（カンマ区切り） | `notSupported=connect-wl` |
 
 **利用可能なアイコンID:**
 - 形状: `shape-split`, `shape-unibody`, `shape-macropad`
@@ -137,8 +140,9 @@ npx http-server
 - 接続: `connect-wr`, `connect-wl`, `connect-halfwired`
 - 互換性: `compat-mx`, `compat-chocv1`, `compat-chocv2`
 - ポインティング: `pointing-tb`, `pointing-tp`, `pointing-td`
-- ファームウェア: `firmware-qmk`, `firmware-zmk`, `firmware-via`, `firmware-vial`
+- ファームウェア: `firmware-qmk`, `firmware-zmk`
 - 拡張機能: `feature-ec`, `feature-dp`
+- 電池形式: `battery-aaa`, `battery-lipo`
 
 ## 🤝 コントリビューション
 
