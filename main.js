@@ -223,6 +223,24 @@ const palette = [
     description_ja: 'リチウムポリマー電池で駆動。薄型軽量で充電可能。',
     description_en: 'Powered by LiPo battery. Thin, lightweight, and rechargeable.',
   },
+
+  // 10. プロファイル (Profile)
+  {
+    id: 'profile-low',
+    category: 'profile',
+    label: 'Low Profile',
+    abbr: 'LP',
+    description_ja: 'ロープロファイルキーキャップ。高さが低く、タイピング時の指の移動距離を減らせる。',
+    description_en: 'Low profile keycaps. Lower height reduces finger travel distance during typing.',
+  },
+  {
+    id: 'profile-normal',
+    category: 'profile',
+    label: 'Normal Profile',
+    abbr: 'NP',
+    description_ja: '通常の高さのキーキャップ。Cherry、SA、DSAなど様々なプロファイルが選択可能。',
+    description_en: 'Standard height keycaps. Various profiles like Cherry, SA, DSA available.',
+  },
 ];
 
 // 固定順序でアイコンを並べるためのインデックスマップ
@@ -267,6 +285,9 @@ const iconFileMap = {
   // Battery
   'battery-aaa': 'fram25_tiles/battery.png',
   'battery-lipo': 'fram25_tiles/lipo.png',
+  // Profile
+  'profile-low': 'fram25_tiles/profile-low.png',
+  'profile-normal': 'fram25_tiles/profile-normal.png',
   // Module marker
   'module-mark': 'fram25_tiles/module.png',
 };
@@ -312,13 +333,14 @@ const categoryOrder = [
   'pitch',
   'connect',
   'compat',
+  'profile',
   'pointing',
   'firmware',
   'features',
   'battery',
   'freeform',
 ];
-const multiSelectCategories = new Set(['connect', 'compat', 'pointing', 'firmware', 'features', 'freeform']);
+const multiSelectCategories = new Set(['connect', 'compat', 'pointing', 'firmware', 'features', 'profile', 'freeform']);
 
 function startCustomIcon(category) {
   if (customIconFileInput) {
@@ -613,6 +635,7 @@ function bootstrapDefaults() {
     { id: 'pitch', category: 'pitch', label: 'Pitch', abbr: state.pitchAbbr, value: state.pitchValue },
     findIcon('connect-wl'),
     findIcon('compat-mx'),
+    findIcon('profile-normal'),
     findIcon('pointing-tb'),
     findIcon('firmware-qmk'),
     findIcon('feature-ec'),

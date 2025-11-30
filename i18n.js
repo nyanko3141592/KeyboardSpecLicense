@@ -39,6 +39,7 @@ export const translations = {
     'category.firmware': 'ファームウェア (Firmware)',
     'category.features': '拡張機能 (Features)',
     'category.battery': '電池形式 (Battery)',
+    'category.profile': 'プロファイル (Profile)',
     'category.freeform': '自由アイコン (Freeform)',
 
     // Freeform
@@ -79,6 +80,8 @@ export const translations = {
     'icon.battery-aaa.desc': '単4電池で駆動。入手しやすく交換も容易。',
     'icon.battery-lipo.desc': 'リチウムポリマー電池で駆動。薄型軽量で充電可能。',
     'battery.textHint': '電池アイコン内に表示するテキスト',
+    'icon.profile-low.desc': 'ロープロファイルキーキャップ。高さが低く、タイピング時の指の移動距離を減らせる。',
+    'icon.profile-normal.desc': '通常の高さのキーキャップ。Cherry、SA、DSAなど様々なプロファイルが選択可能。',
 
     // 選択済みアイコン
     'selected.label': '選択済みアイコン',
@@ -142,6 +145,7 @@ export const translations = {
     'category.firmware': 'Firmware',
     'category.features': 'Features',
     'category.battery': 'Battery',
+    'category.profile': 'Profile',
     'category.freeform': 'Freeform',
 
     // Freeform
@@ -182,6 +186,8 @@ export const translations = {
     'icon.battery-aaa.desc': 'Powered by AAA batteries. Easy to obtain and replace.',
     'icon.battery-lipo.desc': 'Powered by LiPo battery. Thin, lightweight, and rechargeable.',
     'battery.textHint': 'Text to display on battery icon',
+    'icon.profile-low.desc': 'Low profile keycaps. Lower height reduces finger travel distance during typing.',
+    'icon.profile-normal.desc': 'Standard height keycaps. Various profiles like Cherry, SA, DSA available.',
 
     // Selected icons
     'selected.label': 'Selected Icons',
